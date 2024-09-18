@@ -14,7 +14,7 @@ If that is working as expected (i.e. not crashing with an error), the panel to t
     <img src="images/s2.1.jpg" alt="A producer pushing data to a message bus"/>
 </a>
 
-In this section, we're working with the topic called `first-topic`, which will be automatically created as messages are sent to it.  As a reminder, a topic is a [TODO: FILL OUT WHAT A TOPIC IS HERE].
+In this section, we're working with the topic called `first-topic`, which will be automatically created as messages are sent to it.  As a reminder, a topic is a stream of data that applications can publish to and subscribe to.
 
 Let’s try and send some messages now! Click on the “Send Event” button a few times to send messages to the Kafka cluster. To verify everything is working as expected, open the <a href="http://localhost:8080/ui/clusters/local/all-topics/first-topic/messages?keySerde=String&valueSerde=String&limit=100" target="_blank">Kafka UI</a> tab to see that `first-topic` was created, and the message count on the topic should increase each time you click the button.
 

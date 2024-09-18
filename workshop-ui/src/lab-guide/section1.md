@@ -6,7 +6,7 @@ Hi everyone, thanks so much for joining today!  During this presentation, we wil
 
 This lab is meant to introduce you to different design patterns in event-driven architecture. Each section implements a different pattern, building on previous sections. The goal is to demonstrate how event-driven systems behave in different scenarios. 
 
-To start, we will set up our lab environment and look at what has been provided for us!  Also, if you have not already done so, go ahead and prepare for the workshop by downloading Docker Desktop here [TODO: link here] and the docker-compose.yaml file here [TODO: link here].
+To start, we will set up our lab environment and look at what has been provided for us!  Also, if you have not already done so, go ahead and prepare for the workshop by downloading Docker Desktop [here](https://www.docker.com/products/docker-desktop/).
 
 ## Lab Guide and Conventions
 
@@ -42,11 +42,11 @@ If at any point during the lab, you run into any technical issues, there are tro
 
 There is only one terminal command we should need to run, and we will do that together at the root of this repository.  This command will prepare our services in Docker Desktop so that we can just use that tool to stop and start them as we go.  While we will have to run one command in the terminal, most of the work will be done in Docker Desktop and this UI. 
 
-[TODO: EXPLAIN WHAT KAFKA, BROKERS, and CONSUMER/PRODUCERS ARE]
+Kafka is a distributed messaging system that allows applications to publish and subscribe to streams of data called "topics."  A producer is an application that sends data (messages) to a specific topic (or data stream) in Kafka and a consumer is an application that reads messages from a specific topic in Kafka.  A broker is a single server within a Kafka cluster responsible for receiving messages from producers, storing them in partitions within a topic, and delivering them to consumers.  Lastly, Docker is a containerization platform used to run applications like Kafka.
 
 ## Exploring the Lab Repo
 
-This workshop leverages the code found in [this repo](https://github.com/colinjlacy/clus24-devwks-2047). 
+This workshop leverages the code found in [this repo](https://github.com/gracebrickley/clus24-devwks-2047). 
 
 If you are using the public deployment of this lab guide, be sure to clone the repo locally before continuing, as we're going to reference the files found within from here on out.  
 
@@ -72,7 +72,7 @@ If we are all ready to go, we are now going to run our Kafka Cluster.  Let’s c
 #### Snippet 1.2
 <span class="copy"></span>
 ```sh
-docker compose up
+curl -O https://raw.githubusercontent.com/gracebrickley/clus24-devwks-2047/main/docker-compose.yml && docker compose up
 ```
 
 Now, paste the code into the terminal in the folder containing `docker-compose.yaml` and click “enter.”  This may take a few seconds to run.

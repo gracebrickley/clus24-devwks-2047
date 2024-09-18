@@ -33,6 +33,12 @@ The three services we will use are ones we haven’t discussed yet:
 - **the Authorizer** listening on the `authorize` topic
 - **the Notifier** listening on the `notify` topic
 
+Here is a diagram of the architecture:
+
+<a href="images/s4.1.jpg" class="glightbox">
+    <img src="images/s4.1.jpg" alt="Saga Pattern with trace GET requests"/>
+</a>
+
 In more detail, these services create a mock workflow where:
 
 1.  A device is provisioned for a new user.  This takes place in the Provisioner and is the start of the Saga.
@@ -46,11 +52,7 @@ In more detail, these services create a mock workflow where:
 Because this is a workshop, these steps are mocked, but the behavior mimics what would happen in real life in an event-driven architecture system.  This includes an unpredictable lag.  This is because while Kafka guarantees that events arrive in first-in, first-out pattern, there is nothing that guarantees our individual services will finish processing each event in order.
 ## Asynchronous Event Flows
 
-To the left, you will see that under the “Onboard New User” button, there is a toggle for “Trace Mode” which is enabled to start for now.  While on, we will be able to trace exactly where each user’s saga is in the cycle, or where the data is in relation to the consumers as they receive events in their step in the workflow.  Here is a diagram of the architecture:
-
-<a href="images/s4.1.jpg" class="glightbox">
-    <img src="images/s4.1.jpg" alt="Saga Pattern with trace GET requests"/>
-</a>
+To the left, you will see that under the “Onboard New User” button, there is a toggle for “Trace Mode” which is enabled to start for now.  While on, we will be able to trace exactly where each user’s saga is in the cycle, or where the data is in relation to the consumers as they receive events in their step in the workflow.
 
 ## Our Pre-Packaged Consumers
 

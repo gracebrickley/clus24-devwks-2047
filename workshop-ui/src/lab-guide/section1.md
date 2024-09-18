@@ -1,20 +1,22 @@
 # Section 1: Welcome and Setting Up
 
-Thanks for joining!  In this section we'll set up our lab environment in our local environment, and take a look at what has been provided for us.
+Hi everyone, thanks so much for joining today!  During this presentation, we will be discussing event driven architecture and showing examples of different design patterns.   The goal of today is to demonstrate how event-driven systems behave in different scenarios.
 
 ## Goals
 
-This lab is meant to introduce you to different design patterns in event-driven architecture. Each section implements a different pattern, building on previous sections. The goal is to demonstrate how event-driven systems behave in different scenarios.  
+This lab is meant to introduce you to different design patterns in event-driven architecture. Each section implements a different pattern, building on previous sections. The goal is to demonstrate how event-driven systems behave in different scenarios. 
+
+To start, we will set up our lab environment and look at what has been provided for us!  Also, if you have not already done so, go ahead and prepare for the workshop by downloading Docker Desktop here [TODO: link here] and the docker-compose.yaml file here [TODO: link here].
 
 ## Lab Guide and Conventions
 
 ### Layout
 
-In this lab, there are multiple sections that each focus on one or two aspects of event-driven architecture.  You'll typically find some interactive content on the left, and text/images/code snippets provided on the right.  Feel free to read as you go, or follow along.
+There will be five total sections of the lab, the first being this one for set up.  Each section will focus on one or two aspects of event-driven architecture.  There will be some interactive content on the left-hand side and text, images, or code snippets on the right.  Feel free to read as we go or follow along!
 
 ### Navigation
 
-Each of the five sections in this workshop has its own page.  You can use the buttons at the top or bottom of each section to progress through the workshop, or use the hamburger menu in the top left corner to jump to any section you like.
+Each of the five sections in this workshop has its own page.  To navigate between sections, you can either use the buttons at the top and bottom right of each section, or the hamburger menu in the top left.
 
 ### Images
 
@@ -22,7 +24,7 @@ All of the images in the provided text are viewable in a pop-out window, which w
 
 ### Copying Code Snippets
 
-There are code snippets that are shared as examples, and other snippets that are meant to be copied and used in your code or command line.  The ones that are intended to be copied come with a *copy* icon.  Clicking on that icon will copy the contents of the snippet to the clipboard for you, so you can just paste it wherever you need to. 
+For the most part, we will be using Docker Desktop to help us demonstrate in each section, but the code to run each example is included in a code snippet box that can be copied if you want to experiment.  Clicking on the copy icon in the right side of the box will copy the code to your clipboard, so you can paste wherever you need.
 
 Here's an example:
 
@@ -34,13 +36,13 @@ echo "Cisco Live"
 
 ### Troubleshooting and Additional Info
 
-At the bottom of each page you can find further information about the topics discussed within the section, as well as some troubleshooting pointers in case you run into problems with the code snippets in the lab guide. 
+If at any point during the lab, you run into any technical issues, there are troubleshooting pointers at the bottom of each page for each section.  If you are unable to solve the problem using those pointers, please raise your hand and we will try to assist you.  There is also additional information at the bottom of each section if you'd like to learn more.
 
 ### Our Environment
 
-All of the commands listed in this lab guide should be run at the root of a cloned copy of [this repo](https://github.com/colinjlacy/clus24).  While we'll do some very light work in Python, most of the work will be done in the command line and this UI. 
+There is only one terminal command we should need to run, and we will do that together at the root of this repository.  This command will prepare our services in Docker Desktop so that we can just use that tool to stop and start them as we go.  While we will have to run one command in the terminal, most of the work will be done in Docker Desktop and this UI. 
 
-We're going to run multiple processes from the command line in parallel.  We'll open several terminal windows at a time, so it *is highly recommended that you rename the terminal windows as you go*.
+[TODO: EXPLAIN WHAT KAFKA, BROKERS, and CONSUMER/PRODUCERS ARE]
 
 ## Exploring the Lab Repo
 
@@ -50,76 +52,53 @@ If you are using the public deployment of this lab guide, be sure to clone the r
 
 ### Kafka and Friends
 
-Let's start by looking at the `docker-compose.yaml` file.  It comes with seven services that we will use throughout this lab:
-- `zookeeper`: this is a management/orchestration service that configures our Kafka brokers to work together. Although it is necessary to run Kafka, we won't interact with this at all during this workshop.
-- `kafka1` and `kafka2`: these are our Apache Kafka brokers, to which our Producers and Consumers will connect to pass messages to each other.
-- `kafka-ui`: an extremely useful tool that allows us to visualize what's happening inside our Kafka cluster.
+Let’s now take a look at the `docker-compose.yaml` file that has been provided to you.  There are twelve services defined in the file that we will use throughout the lab:
+- `zookeeper`: this is a management/orchestration service that configures our Kafka brokers to work together. It is necessary to run Kafka, but we won't go into detail or interact with it at all during this workshop.
+- `kafka1` and `kafka2`: these are our two Kafka brokers (configured by zookeeper) that our Producers and Consumers will connect to so that they can pass messages.
+- `kafka-ui`: this tool will help us visualize what is happening inside our Kafka cluster when messages are sent/received.
+- `producer`: this service will help us to send messages to the Message Bus and ultimately our consumers.
+- `primary-consumer`, `blue-consumer`, and `orange-consumer`: these three services will demonstrate how consumers behave and interact with one another given different configurations. 
 - `provisioner`, `authorizer`, and `notifier`: three consumer/producers that we'll use to illustrate the saga pattern in Section 4.
+- `error-consumer`: this service will mimic a way to handle errors in an event-driven system in Section 5.
 
 ### The Python Files
 
-There are three Python files in this repo as well, which we'll start interacting with in the next section.
-- `producer.py` is a very small file (less than 60 lines!), and comes with a single REST endpoint, as well as a Kafka connection for *producing* event messages to a topic.  Once we configure this file, we'll use it for the duration of the lab.
-- `consumer.py` receives event messages from a specific topic stores them in memory for retrieval via a REST endpoint. This one is a little more complex than `producer.py`, making use of the `asyncio` Python library to juggle multiple tasks at a time.
-- `consumer-producer/cp.py` is the file that was used to create the `provisioner`, `authorizer`, and `notifier` services mentioned above. We won't look at the code in this file, but it's included for you to look at offline, if you'd like to see how the sandbox services work under the hood.
+The python code running in the background to help our services run is available to view at this repo: [TODO: FILL IN REPO]. We won’t be diving into the specifics of the code, but it is included in case you want to take a look at how the sandbox services work under the hood after the workshop.
 
 ## Running the Kafka Cluster
 
-When you're ready, open a command line and navigate to the repo you just cloned, which houses this lab guide.  Then, run the following command to start the Kafka Cluster and its associated components:
+If we are all ready to go, we are now going to run our Kafka Cluster.  Let’s copy this code snippet to our clipboard:  
 
 #### Snippet 1.2
 <span class="copy"></span>
 ```sh
-docker-compose up \
-  kafka-ui zookeeper kafka1 kafka2
+docker compose up
 ```
 
-Let's make sure everything is up and running by diving into the [Kafka UI](http://localhost:8080).
+Now, paste the code into the terminal in the folder containing `docker-compose.yaml` and click “enter.”  This may take a few seconds to run.
 
-The first thing you should see is a Dashboard with a single cluster listed, which is called `local`:
+Please open Docker Desktop and look at all our services.  There should be 4 out of 12 running (`zookeeper`, `kafka-ui`, `kafka1`, and `kafka2`).
+
+Now that we have verified that everything is up and running, lets checkout what’s happening by jumping into the [Kafka UI](http://localhost:8080).  The first page that pops up is the Dashboard with a single cluster listed called “local”.  We can also see this cluster listed in the navigation menu to the left.
 
 <a href="images/s1.1.png" class="glightbox">
     <img src="images/s1.1.png" alt="Kafka UI Dashboard"/>
 </a>
 
-On the left, you'll see a navigation menu for this cluster.  If you click on **Topics**, you'll see that several topics were already created for you:
+Now, click on the local cluster’s **Topics** to explore.  As you can see, there are no topics listed yet.  As we send messages, topics will be automatically created for us that producers will send messages to, and consumers will consume messages from.
 
-<a href="images/s1.2.png" class="glightbox">
-    <img src="images/s1.2.png" alt="Two topics already created"/>
-</a>
-
-Those were configured in the `docker-compose.yml` file, in the section that defined the `kafka1` and `kafka2` containers:
-
-#### Snippet 1.3
-```yaml
-kafka1:
-    image: wurstmeister/kafka:2.13-2.8.1
-    container_name: kafka1
-    # ...
-    environment:
-      # ...
-      KAFKA_CREATE_TOPICS: "first-topic:2:2,fanout-topic:2:2,new-user:2:2,authorize:2:2,notify:2:2,notified:2:2,dlq:2:2"
-```
-
-If you were experimenting outside of this lab and wanted to create and configure more topics, you could delete the existing container, add more topics to this comma-separated list, and then recreate the container via the `docker-compose` command. **Note:** you have to delete the previous container in order for the new topics to be created.
+There is a way to preconfigure topics as well, but for the purposes of this lab, we have auto-create enabled in the `docker-compose.yaml` file.
 
 ## Troubleshooting the Kafka Services
 
-If either of the Kafka brokers are not running, or if the topics are showing error statuses for their partitions, the best way to solve this problem is to stop the Kafka services using `Ctrl+C`. Then, run the following command to remove the existing containers:
-
-#### Snippet 1.4
-<span class="copy"></span>
-```shell
-docker rm kafka1 kafka2 zookeeper
-```
+If either of the Kafka brokers are not running, or if the topics are showing error statuses for their partitions, the best way to solve this problem is to stop the Kafka services by pressing the "stop" button in Docker Desktop. Then, select the checkbox and press the trash button to remove the existing containers.
 
 This will remove the containers *and remove their temporary storage space on disk,* which is likely the cause of any services crashing due to stale data from a previous run.
 
-Now run the `up` command again:
+Now run the `docker compose up` command again:
 
 #### Snippet 1.5
 <span class="copy"></span>
 ```sh
-docker-compose up \
-  kafka-ui zookeeper kafka1 kafka2
+docker compose up
 ```

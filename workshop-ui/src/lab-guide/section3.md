@@ -2,30 +2,17 @@
 
 In this section we'll experiment with Consumer Groups to see how multiple consumers handle events on the same topic.
 
-You should see on the left that both the Producer and existing Consumer are running. Refer back to the previous section if you need to stand them up again.
+The page should look similar to the last, but with an extra, “Second Consumer.”  The Producer and existing, “First Consumer” should still be running from the last section.  
 
 ## What is a Consumer Group?
 
-Kafka keeps track of which consumers are subscribed to specific topics, ensuring that each consumer receives a message once and only once.  In most cloud-based systems, we generally want to ensure high availability, which often means running more than one instance of a microservice.  With that in mind, we can arrange consumers into **consumer Groups**. Kafka also keeps track of which consumer groups are subscribed to a topic, as well as which consumers are a part of which consumer group. Let's see how consumer groups behave with a little experimentation.  
+First, let’s talk about what a consumer group is.  Kafka keeps track of which consumers are subscribed to specific topics to ensure that each consumer only receives a message once.  In most cloud-based systems, we generally want to ensure high availability.  High availability is a design approach that allows a system to continue operating without failure, even when individual components fail.  This often means running more than one instance of a microservice.
+
+Knowing that, we can arrange multiple consumers into **Consumer Groups**.  Kafka keeps track of which consumer groups are subscribed to a topic, as well as which consumers are a part of which group.  Now, let’s experiment to see how Consumer Groups behave!
 
 ## Multiple Consumers in the Same Group
 
-We're going to start another Consumer using the same `consumer.py` file. 
-
-Let's open a new command line window in the same directory as our Python files. We'll use the same Kafka configuration environment variables, but we'll also add a new one that specifies the port that we'll connect to in order to pull the consumed events:
-
-#### Snippet 3.1
-<span class="copy"></span>
-```sh
-source venv/bin/activate && 
-KAFKA_TOPIC="first-topic" \
-KAFKA_BOOTSTRAP_SERVERS="localhost:9093,localhost:9094" \
-CONSUMER_GROUP="first-group" \
-PORT=8001 \
-python3 consumer.py
-```
-
-Once both Consumers are up and running, you should see them both display their group as `first-group` in blue text. If not, check the environment variables that you entered to ensure that they're identical to what's shown above.
+First, let’s start up the second Consumer.  We need to go into Docker Desktop and click the play button for the container that’s named `blue-consumer`.  Once this consumer is up and running, the workshop UI should show the group for the second Consumer as `blue-group` in blue text.  
 
 The system now looks like this:
 
@@ -33,59 +20,43 @@ The system now looks like this:
     <img src="images/s3.1.jpg" alt="Multiple consumers in the same consumer group"/>
 </a>
 
-Click the **Send Event** button a few times and watch what happens.  You'll notice that the events are split between the two Consumers!  That's because Kafka (and other message buses like it) distribute events between the Consumers in a Consumer Group. 
+It’s very similar to before, but with both consumers in the same consumer group.  Let’s try it out and see what happens!
 
-There are various ways to configure how events are distributed, but in this case, we're just using the default, which is a *roughly* even distribution.
+Click the **Send Event** button a few times and watch what happens.  
+
+As you can see, the events are split between the two Consumers!  This happens because Kafka knows that both Consumers are in the same Consumer Group and splits events between them.  There is an option to configure how events are distributed among Consumers in a Consumer Group but we are using the default which is a *roughly* even distribution.
 
 > ### Discussion
 > What is the benefit of having multiple consumer instances in the same group?
-> 
-> Do you think there's a limit as to how many consumer instances can exist in the same group?
 
 ### Downscaling (or Crashing) an Instance
 
-Now, shut down the Second Consumer using `Ctrl+C`, and click the **Send Event** button a few more times. 
+Now, let’s mimic what would happen if one of our instances were to crash.  Go ahead and go into Docker Desktop and press the stop button on the container named `blue-consumer`.  Then, go back to the workshop UI and send a few more events.  
 
-**What do you notice happens?**
-
-> ### Discussion
-> What do you think this means in terms of good practices for high availability?
+We can see that Kafka sends all events to the First Consumer because it knows that the Second Consumer is offline.  This is good in terms of high availability because no events/messages are lost in the case of component failure.
 
 ## Different Groups, the Fan-Out Pattern
 
-Let's start the Second Consumer again, but this time in a **different Consumer Group**:
-
-#### Snippet 3.2
-<span class="copy"></span>
-```sh
-source venv/bin/activate && 
-KAFKA_TOPIC="first-topic" \
-KAFKA_BOOTSTRAP_SERVERS="localhost:9093,localhost:9094" \
-CONSUMER_GROUP="second-group" \
-PORT=8001 \
-python3 consumer.py
-```
-
-Once the UI shows the Second Consumer is online, you'll see `second-group` displayed in orange.  Our system now looks slightly different:
+Next, we are going to start the second consumer again, but this time it will be a part of a **different Consumer Group**.  Go into Docker Desktop and start the container named `orange-consumer`.  Once you see that the Second Consumer is online again, it should also say it is a part of the `orange-group`.  Now, the system looks like this:
 
 <a href="images/s3.2.jpg" class="glightbox">
     <img src="images/s3.2.jpg" alt="Two consumers in different consumer groups"/>
 </a>
 
-Now click the **Send Event** button
+It is very similar to the last diagram, but each Consumer is in its own Consumer Group.
+
+Now click the **Send Event** button again.
 
 Each Consumer Group will receive the events on the `first-topic` once. This is a very basic implementation of what's known as the **Fan-Out Pattern**.
 
-Notice how each Consumer receives and processes the same event in parallel, adding its own `consumed` time to the event before it is read back by the UI.
+Notice that each Consumer Group receives each event once.  This is an implementation of the **Fan-Out Pattern**. Notice that each Consumer receives and processes the same event in parallel, meaning that each Consumer displays its own “consumed time” to the event before it is read back by the UI. 
 
-> ### Discussion
-> What are some use cases of the fan-out pattern that you can think of?
-> 
-> What do you think are some trade-offs to consider as you scale to more parallel consumers on a topic?
+> ### Note
+>[TODO: add in some examples of where this could be useful]
 
 ## Moving on
 
-Leave the Producer running, but shut down both of the Consumers with `Ctrl+C`.  When you're ready, click the button below to move to the next section.
+We are going to move onto the next section now.  Leave the Producer running, but press the stop button on both Consumers in Docker Desktop and lets click the button to move on to Section 4.
 
 <hr>
 

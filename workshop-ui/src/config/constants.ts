@@ -1,6 +1,6 @@
 const PROTO: string = "http"
 const DOMAIN: string = "localhost"
-export const PRODUCER_URL = `${PROTO}://${DOMAIN}:5000`
+export const PRODUCER_URL = `${PROTO}://${DOMAIN}:8888`
 export const FIRST_CONSUMER_URL = `${PROTO}://${DOMAIN}:8000`
 export const SECOND_CONSUMER_URL = `${PROTO}://${DOMAIN}:8001`
 export const FIRST_GROUP = `first-group`

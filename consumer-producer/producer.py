@@ -1,4 +1,4 @@
-import json
+import json, os
 from datetime import datetime
 
 from flask import Flask, request
@@ -9,10 +9,14 @@ app = Flask(__name__)
 cors = CORS(app)
 
 producer = KafkaProducer(
-    bootstrap_servers=[],
-    value_serializer=None
+    bootstrap_servers=os.environ.get('KAFKA_BOOTSTRAP_SERVERS').split(","),
+    # bootstrap_servers=[
+    #     "localhost:9093",
+    #     "localhost:9094"
+    # ],
+    value_serializer=lambda m:
+        json.dumps(m).encode('utf-8'),
 )
-
 
 @app.post('/')
 @cross_origin()

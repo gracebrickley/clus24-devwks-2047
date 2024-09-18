@@ -150,7 +150,7 @@ export default function Section3() {
                             First Consumer: {!isFirstConsumerActive && "Offline"}
                         </Typography>
 
-                        <Typography variant="h5" gutterBottom fontWeight={"bold"} color={!isFirstConsumerActive ? "lightgray" : firstConsumerGroup === FIRST_GROUP ? "info.main" : "warning.main"}>
+                        <Typography variant="h5" gutterBottom fontWeight={"bold"} color={!isFirstConsumerActive ? "lightgray" : firstConsumerGroup === "blue-group" ? "info.main" : "warning.main"}>
                             <span>Group: {firstConsumerGroup}</span>
                         </Typography>
 
@@ -187,7 +187,7 @@ export default function Section3() {
                             Second Consumer: {!isSecondConsumerActive && "Offline"}
                         </Typography>
 
-                        <Typography variant="h5" gutterBottom fontWeight={"bold"} color={!isSecondConsumerActive ? "lightgray" : secondConsumerGroup === FIRST_GROUP ? "info.main" : "warning.main"}>
+                        <Typography variant="h5" gutterBottom fontWeight={"bold"} color={!isSecondConsumerActive ? "lightgray" : secondConsumerGroup === "blue-group" ? "info.main" : "warning.main"}>
                             Group: {secondConsumerGroup}
                         </Typography>
 

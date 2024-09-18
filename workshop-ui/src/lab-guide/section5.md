@@ -7,65 +7,45 @@ In our last section, we'll look at two patterns:
 
 ## Dead-Letter Queue
 
-In an event-driven system, there's generally no user or admin watching events flow through different services to keep track of their progress and success.  That means that if an error happens and stops the flow of events, no one is watching to triage and remediate the problem.
+As we saw in the last section, in an event-driven system, there is typically no one watching the events flow through different services and steps to make sure each part is succeeding, and that the saga is proceeding as expected.  This means that if an error were to occur, there is no one watching to fix it.
 
-That's where a **Dead-Letter Queue** (or DLQ for short) comes in, which is usually (at least) one dedicated *topic* that system designers will add to their message bus, allowing any number of services to send their error events so that they can be aggregated and tracked.
+That's where a **Dead-Letter Queue** (or DLQ for short) comes in. This pattern is where system designers have one dedicated topic added to the Message Bus which allows any number of services to send their error events to so that they can be aggregated and tracked. 
 
-Most event-driven systems will have more than one DLQ, but a minimum of one is usually the starting point for handling errors.
-
-> ### Discussion
-> How does this compare to error handling in a RESTful system?
+Most event-driven systems will have more than one DLQ, but to handle errors, a minimum of one is required.
 
 ### Dead-Letter Queue in Action
 
-We'll use the same three services that we used in Section 4 to demo the Saga Pattern. However, in this section, they will raise errors in their workflow. This will happen automatically, in order to simulate real-life errors that can arise in your event-driven architecture.
+To demonstrate a DLQ, we are going to take our system from the last section and add a topic for errors.  Each of the three services from last time have the same purpose, but this time they will each potentially raise errors in their workflow. This will happen automatically, in order to simulate real-life errors that can arise in your event-driven architecture.
 
-We'll also come back to `consumer.py`, and we'll configure it to listen on the topic `dlq`. In a terminal window, run the following command:
-
-#### Snippet 5.1
-<span class="copy"></span>
-```sh
-source venv/bin/activate && 
-KAFKA_TOPIC="dlq" \
-KAFKA_BOOTSTRAP_SERVERS="localhost:9093,localhost:9094" \
-CONSUMER_GROUP="error-group" \
-PORT=8084 \
-python3 consumer.py
-```
-
-The **Users** display is a simplified version of what we used in Section 4, simply meant to show users in either the *pending* or *complete* state.
-
-Once everything is running, click the button to the left to send a few users to be onboarded. Feel free to send all 10 users if you like!
-
-Since we're using the same services, there will be the same built-in delay in how the users are onboarded.
-
-Some of these users are going to take longer than others, and *some will never complete*. Take a look at the **Errors** tab to see if any of those *pending* users are in an error state.
-
-
-### Behind the Scenes
-
-Each of the services in the Saga has a possibility of raising errors to the `dlq` topic, which will then arrive at the Consumer we started at the beginning of this section. The full system looks like this:
+Here is a diagram of what that will look like:
 
 <a href="images/s5.1.jpg" class="glightbox">
     <img src="images/s5.1.jpg" alt="Dead-letter queue integrated into the saga pattern"/>
 </a>
 
-While there's *technically* not a lot of new information provided here, it's important to note that error handling is one of the most crucial aspects of an event-driven system, and the DLQ is arguably the most common pattern of any event-driven architecture.
+Although this doesn’t seem too different from the last section, it is important to notice that error handling is one of the most important parts of an event-driven system.  The Dead Letter Queue is arguably the most common pattern of any event-driven architecture.
 
-> ### Discussion
-> We're ending our event flow at the error consumer. Are there other things that we could do instead?
->
-> Do you think it might be a good idea to have multiple error topics in some situations?
+The **Users** display is a simplified version of what we used in Section 4, simply meant to show users in either the *pending* or *complete* state.
+
+Let’s open Docker Desktop and click the start button on the service called `error-consumer` and click the **Onboard New User** button to send a few users to be onboarded.  Feel free to send all 10 users!
+
+Because they are the same services from last section, there is the same built-in delay in how the users are onboarded.  Some users will take longer than others to complete, but some will never complete.  
+
+Take a look at the **Errors** tab to see if any users that are stuck in the *pending* state are actually in an error state.
+
+> ### Note
+> In this example, we end our workflow at the error consumer.  There are other things we could possibly do with that information as well.  For example, we could trigger an email to alert admin that an error occurred and inform them at what step in the process that it happened.
+> It could also be beneficial to have multiple error topics in some situations because depending on the error that is thrown, the action that should be taken may be vary.  If we have more than one error topic, that allows flexibility in how we respond to each error topic.
 
 ## Fan-In
 
-The DLQ is a common implementation of a more generic pattern, known as the **Fan-In Pattern**. This is when multiple producers push events to a single topic, with one consumer-group receiving and aggregating the resulting events.
+The DLQ is a common implementation of a more generic pattern we mentioned earlier called the **Fan-In Pattern**. This is when multiple producers push events to a single topic, with one consumer-group receiving and aggregating the events.
 
 <a href="images/s5.2.jpg" class="glightbox">
     <img src="images/s5.2.jpg" alt="Fan-in pattern"/>
 </a>
 
-In our implementation, we're using a single instance of a consumer, and aggregating the events in-memory.  In a production environment, you're more likely to see multiple consumer instances, with the aggregation happening in a data persistence layer - i.e. a database.
+In our implementation, we're using a single instance of a consumer, and aggregating the events in-memory.  In production, however, the aggregation will likely happen in a data persistence layer such as a database.
 
 <a href="images/s5.3.jpg" class="glightbox">
     <img src="images/s5.3.jpg" alt="Fan-in pattern with persistence layer"/>
@@ -73,12 +53,11 @@ In our implementation, we're using a single instance of a consumer, and aggregat
 
 You may notice that this builds on system design that was shared in the **Additional Information** part of Section 2.
 
-> ### Discussion
-> Based on what we've seen here, and the diagram above, what do you think is a good use case for the fan-in pattern?
-
 ## Closing Up
 
-At this point, we can shut down all of our services.  Use `Ctrl-C` to shut down `producer.py` and `consumer.py`, and then run `docker-compose down` to shut down all of the Docker services used in this workshop.
+At this point, we are wrapping up the workshop so we can shut down all of our services.  Let’s go into Docker Desktop one last time and stop all the containers that are running.  
+
+Thank you so much for joining this workshop and learning about event-driven architecture with me!
 
 ## Additional Information
 

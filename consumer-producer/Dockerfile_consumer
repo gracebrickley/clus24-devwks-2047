@@ -1,0 +1,15 @@
+FROM python:3.12.6-bullseye
+
+WORKDIR /app
+
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV KAFKA_BOOTSTRAP_SERVERS="kafka1:9092,kafka2:9092"
+ENV KAFKA_TOPIC="first-topic"
+ENV CONSUMER_GROUP="first-group"
+ENV HOST="0.0.0.0"
+
+CMD python /app/consumer.py

@@ -2,127 +2,38 @@
 
 ## Setup
 
-We'll need to make sure all of our dependencies are installed before we can run our `producer.py` and `consumer.py` files. 
-
-The following set of commands creates and activates a fresh virtual environment, and then installs dependencies listed in the `requirements.txt` file:
-
-#### Snippet 2.1
-<span class="copy"></span>
-```shell
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-```
-
-Copy and paste these commands into your command line and then press enter. You'll see output logs showing each of the dependency packages being installed into your virtual environment. 
+If you look to the left, you will see two boxes representing the producer and the consumer.  The lab is looking for both and can’t find them, which means that they aren’t running.  Let’s solve that right now.
 
 ## Running the Producer
 
-If you look to the left, you'll notice there's an indicator showing that this lab guide is looking for a Producer and can't seem to find it, which indicates that it's not running.  Let's solve that problem right now.
+First, let’s get the Producer up and running.  Go into Docker Desktop, find the service titled `producer`, and click the play button.
 
-The `producer.py` file requires some configuration before we can run it. Lines 11-14 show the configuration data points necessary for running the consumer; however those data points are empty.  If we were to run this code right now, we would get an error.
-
-Let's populate those configuration values so that we can set up a Producer connection to our Kafka cluster:
-
-#### Snippet 2.2
-<span class="copy"></span>
-```python
-producer = KafkaProducer(
-    bootstrap_servers=[
-        '127.0.0.1:9093', 
-        '127.0.0.1:9094'
-    ],
-    value_serializer=lambda m:
-        json.dumps(m).encode('utf-8'),
-)
-```
-
-The first configuration, `bootstrap_servers`, tells our Python code where to look for Kafka brokers to connect to in order to *initialize* a connection.  Once the connection is made, the broker will tell the Producer all that it needs to know about the cluster, so that it can send events to any one of the brokers that are available.
-
-The second configuration tells our code how to *serialize* the data it sends into a byte array - that is, how to convert it into a raw byte array.
-
-**Be sure to save with `Ctrl+S`.**
-
-With that configured, let's run the Producer by typing the following in a command line, in the local repo directory:
-
-#### Snippet 2.3
-<span class="copy"></span>
-```shell
-source venv/bin/activate &&
-python3 producer.py
-```
-
-If your configuration was correct, the panel to the left should indicate that the Producer is online.  Nicely done!  The system should currently look like this:
+If that is working as expected (i.e. not crashing with an error), the panel to the left should indicate that the Producer is online.  Nicely done!  The system should currently look like this:
 
 <a href="images/s2.1.jpg" class="glightbox">
     <img src="images/s2.1.jpg" alt="A producer pushing data to a message bus"/>
 </a>
 
-In this section, we're working with the topic called `first-topic`, which is configured as the default topic in `producer.py`.
+In this section, we're working with the topic called `first-topic`, which will be automatically created as messages are sent to it.  As a reminder, a topic is a [TODO: FILL OUT WHAT A TOPIC IS HERE].
 
-Click on the button to the left a few times to send some messages to the Kafka cluster. You can check in the <a href="http://localhost:8080/ui/clusters/local/all-topics/first-topic/messages?keySerde=String&valueSerde=String&limit=100" target="_blank">Kafka UI</a> tab to see the message count on the `first-topic` topic increase each time you click the button.
+Let’s try and send some messages now! Click on the “Send Event” button a few times to send messages to the Kafka cluster. To verify everything is working as expected, open the <a href="http://localhost:8080/ui/clusters/local/all-topics/first-topic/messages?keySerde=String&valueSerde=String&limit=100" target="_blank">Kafka UI</a> tab to see that `first-topic` was created, and the message count on the topic should increase each time you click the button.
 
 ## Running the Consumer
 
-Configuring the consumer requires a little more input, and this time, instead of hard-coding our configuration values, we'll pass in environment variables to set up our Kafka connection.
+Now, let’s get the consumer up and running.  Go into Docker Desktop, find the service titled `primary-consumer`, and click the play button.  The workshop UI should now reflect that the Consumer is online.
 
-In the `consumer.py` file, you'll notice lines 18 - 22 have constants set by environment variables:
+Let’s try clicking **Send Event** again now that the Consumer is running.  As we click the button, the UI sends a POST request to the Producer, which will turn into an Event that is sent to the `first-topic` topic in Kafka and is then received by the Consumer.  Last, the UI runs the GET request.
 
-#### Snippet 2.4
-```py
-KAFKA_TOPIC = os.environ['KAFKA_TOPIC']
-KAFKA_BOOTSTRAP_SERVERS = (
-    os.environ["KAFKA_BOOTSTRAP_SERVERS"].split(",")
-)
-CONSUMER_GROUP = os.environ["CONSUMER_GROUP"]
-```
-
-When we run this file, we can pass in whatever values we want to ensure that this Consumer connects to the right Kafka cluster. To do that, we'll need to set those values when we run this file:
-
-#### Snippet 2.5
-<span class="copy"></span>
-```sh
-source venv/bin/activate && 
-KAFKA_TOPIC="first-topic" \
-KAFKA_BOOTSTRAP_SERVERS="localhost:9093,localhost:9094" \
-CONSUMER_GROUP="first-group" \
-python3 consumer.py
-```
-
-Once that's connected, you should see a log printed to the console saying, *"Starting consumer on topic first-topic, in group first-group"*. The system now looks like the following diagram:
-
-<a href="images/s2.2.jpg" class="glightbox">
-    <img src="images/s2.2.jpg" alt="A producer pushing data to a message bus, and a consumer receiving it"/>
-</a>
-
-
-Try clicking the **Send Event** button to the left a few times. Each time you do, the UI will send a POST request to the Producer, which will turn it into an Event that is sent to the `first-topic` topic in Kafka, and ultimately received by the Consumer. The UI, Producer, and Consumer will all each a time at which the event was handled.
-
-> ### Discussion
-> What do you notice about the timestamps between the different events? Specifically, is there a pattern that you notice about which step takes the longest?
+> ### Note
+> If you look at the time stamps, you may notice that when the event is consumed is several seconds after the event is produced.  There is a bit of lag between the two, but there’s a tradeoff for this that we will now demonstrate.  
 
 ### Compensating for Downtime
 
-Let's experiment with the Consumer a bit.  Try shutting down the Consumer using `Ctrl+C`. Once it's no longer running, click the button to the left a three or four more times to send some events to Kafka.  
+Let’s see what happens if the Consumer were to crash.  Open Docker Desktop and click the stop button for the `primary-consumer`.  Then go back into the workshop UI and send a few events.  The events are not being registered by the consumer because it is offline.  
 
-Now, restart the Consumer again with the following command (which you can probably just press the up button to recall):
+Now, go back to Docker Desktop and restart the `primary-consumer` again.  Notice in the workshop UI that all of the events sent while the Consumer was down, now appear to be registered by the Consumer.
 
-#### Snippet 2.6
-<span class="copy"></span>
-```sh
-source venv/bin/activate && 
-KAFKA_TOPIC="first-topic" \
-KAFKA_BOOTSTRAP_SERVERS="localhost:9093,localhost:9094" \
-CONSUMER_GROUP="first-group" \
-python3 consumer.py
-```
-
-**What do you notice?**  What benefit does this provide?
-
-> ### Discussion
-> What do you think made it possible for the Consumer to pick up messages that were sent when it was offline?
-> 
-> How does this compare to different system designs like service-to-service REST requests?
+If the Consumer goes offline and messages are sent, they are still sent to the Message Bus and stored in the topic.  Then, when the Consumer comes back online, all the messages that occurred in the downtime are waiting for it.  This is different than other designs like service-to-service REST requests because events are never missed or lost if anything is offline or goes wrong.
 
 ## Moving on
 
@@ -149,6 +60,7 @@ We may be using this `consumer.py` file to connect to a local Kafka cluster; but
 The `consumer.py` and `consumer-producer/cp.py` files both use a Kafka library called [aiokafka](https://github.com/aio-libs/aiokafka), which uses [asyncio](https://docs.python.org/3/library/asyncio.html) to consume events from Kafka. The reason this is so important, and the reason we're not using the long-standing [kafka-python](https://kafka-python.readthedocs.io/en/master/) library that is used in `producer.py`, is that topic consumption is a blocking process. That means the consumer function itself blocks anything else from happening (e.g. a RESTful API).      
 
 ## Troubleshooting the Producer
+[TODO: CHANGE TROUBLESHOOTING ADVICE]
 
 If the Producer does not show as connected, check your `KafkaProducer` configuration again, ensuring that it matches what's shown above. Also be sure to check that the RESTful endpoints in the Producer are correctly configured. There should be at least one `GET` endpoint listening at `http://localhost:5000/ping`, which the lab guide uses to determine if the Producer is available.
 

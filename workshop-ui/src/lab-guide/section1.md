@@ -4,7 +4,7 @@ Hi everyone, thanks so much for joining today!  During this presentation, we wil
 
 ## Goals
 
-This lab is meant to introduce you to different design patterns in event-driven architecture. Each section implements a different pattern, building on previous sections. The goal is to demonstrate how event-driven systems behave in different scenarios. 
+This lab is meant to introduce you to different design patterns in event-driven architecture. Each section implements a different pattern, building on previous sections.
 
 To start, we will set up our lab environment and look at what has been provided for us!  Also, if you have not already done so, go ahead and prepare for the workshop by downloading Docker Desktop [here](https://www.docker.com/products/docker-desktop/).
 
@@ -46,9 +46,7 @@ Kafka is a distributed messaging system that allows applications to publish and 
 
 ## Exploring the Lab Repo
 
-This workshop leverages the code found in [this repo](https://github.com/gracebrickley/clus24-devwks-2047). 
-
-If you are using the public deployment of this lab guide, be sure to clone the repo locally before continuing, as we're going to reference the files found within from here on out.  
+This workshop leverages the code found in [this repo](https://github.com/gracebrickley/clus24-devwks-2047).  
 
 ### Kafka and Friends
 
@@ -63,7 +61,7 @@ Let’s now take a look at the `docker-compose.yaml` file that has been provided
 
 ### The Python Files
 
-The python code running in the background to help our services run is available to view at this repo: [TODO: FILL IN REPO]. We won’t be diving into the specifics of the code, but it is included in case you want to take a look at how the sandbox services work under the hood after the workshop.
+The python code running in the background to help our services run is available to view at this repo: [this repo](https://github.com/gracebrickley/clus24-devwks-2047). We won’t be diving into the specifics of the code, but it is included in case you want to take a look at how the sandbox services work under the hood after the workshop.
 
 ## Running the Kafka Cluster
 
@@ -72,10 +70,16 @@ If we are all ready to go, we are now going to run our Kafka Cluster.  Let’s c
 #### Snippet 1.2
 <span class="copy"></span>
 ```sh
-curl -O https://raw.githubusercontent.com/gracebrickley/clus24-devwks-2047/main/docker-compose.yml && docker compose up
+curl -O https://raw.githubusercontent.com/gracebrickley/clus24-devwks-2047/main/docker-compose.yml
 ```
 
-Now, paste the code into the terminal in the folder containing `docker-compose.yaml` and click “enter.”  This may take a few seconds to run.
+#### Snippet 1.3
+<span class="copy"></span>
+```sh
+docker compose up
+```
+
+Now, paste the code snippets into the terminal in a folder one at a time and click “enter.”  This may take a few seconds to run.
 
 Please open Docker Desktop and look at all our services.  There should be 4 out of 12 running (`zookeeper`, `kafka-ui`, `kafka1`, and `kafka2`).
 

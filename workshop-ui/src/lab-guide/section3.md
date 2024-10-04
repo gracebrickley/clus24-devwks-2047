@@ -52,7 +52,7 @@ Each Consumer Group will receive the events on the `first-topic` once. This is a
 Notice that each Consumer Group receives each event once.  This is an implementation of the **Fan-Out Pattern**. Notice that each Consumer receives and processes the same event in parallel, meaning that each Consumer displays its own “consumed time” to the event before it is read back by the UI. 
 
 > ### Note
->[TODO: add in some examples of where this could be useful]
+>This pattern is helpful when there are multiple services that need information from a producer.
 
 ## Moving on
 

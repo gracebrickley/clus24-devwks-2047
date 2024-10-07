@@ -152,6 +152,7 @@ services:
 
     provisioner:
         image: ghcr.io/gracebrickley/provisioner:latest
+        container_name: provisioner
         ports:
             - "8081:8081"
         expose:
@@ -165,6 +166,7 @@ services:
 
     authorizer:
         image: ghcr.io/gracebrickley/authorizer:latest
+        container_name: authorizer
         ports:
             - "8082:8082"
         expose:
@@ -181,6 +183,7 @@ services:
 
     notifier:
         image: ghcr.io/gracebrickley/notifier:latest
+        container_name: notifier
         ports:
             - "8083:8083"
         expose:

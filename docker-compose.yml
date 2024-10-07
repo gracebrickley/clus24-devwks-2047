@@ -67,7 +67,7 @@ services:
             KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
 
     producer:
-        image: ghcr.io/colinjlacy/eda-producer:latest
+        image: ghcr.io/gracebrickley/producer:latest
         ports:
             - "8888:8888"
         expose:
@@ -83,7 +83,7 @@ services:
             HOST: '0.0.0.0'
 
     primary-consumer:
-        image: ghcr.io/colinjlacy/eda-consumer:latest
+        image: ghcr.io/gracebrickley/consumer:latest
         ports:
             - "8000:8000"
         expose:
@@ -100,7 +100,7 @@ services:
             PORT: "8000"
 
     blue-consumer:
-        image: ghcr.io/colinjlacy/eda-consumer:latest
+        image: ghcr.io/gracebrickley/consumer:latest
         ports:
             - "8001:8001"
         expose:
@@ -117,7 +117,7 @@ services:
             PORT: "8001"
 
     orange-consumer:
-        image: ghcr.io/colinjlacy/eda-consumer:latest
+        image: ghcr.io/gracebrickley/consumer:latest
         ports:
             - "8001:8001"
         expose:
@@ -134,7 +134,7 @@ services:
             PORT: "8001"
 
     error-consumer:
-        image: ghcr.io/colinjlacy/eda-consumer:latest
+        image: ghcr.io/gracebrickley/consumer:latest
         ports:
             - "8084:8084"
         expose:
@@ -151,10 +151,7 @@ services:
             PORT: "8084"
 
     provisioner:
-        build:
-            context: ./consumer-producer
-            dockerfile: ./Dockerfile_cp
-        container_name: provisioner
+        image: ghcr.io/gracebrickley/provisioner:latest
         ports:
             - "8081:8081"
         expose:
@@ -167,10 +164,7 @@ services:
             PORT: 8081
 
     authorizer:
-        build:
-            context: ./consumer-producer
-            dockerfile: ./Dockerfile_cp
-        container_name: authorizer
+        image: ghcr.io/gracebrickley/authorizer:latest
         ports:
             - "8082:8082"
         expose:
@@ -186,10 +180,7 @@ services:
             PORT: 8082
 
     notifier:
-        build:
-            context: ./consumer-producer
-            dockerfile: ./Dockerfile_cp
-        container_name: notifier
+        image: ghcr.io/gracebrickley/notifier:latest
         ports:
             - "8083:8083"
         expose:

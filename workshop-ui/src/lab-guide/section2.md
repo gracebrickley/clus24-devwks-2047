@@ -1,5 +1,11 @@
 # Section 2: First Event Messages
 
+## Kafka and Friends
+
+Let's introduce two new services in the `docker-compose.yaml` file:
+- `producer`: this service will help us to send messages to the Message Bus and ultimately our consumers.
+- `primary-consumer`: this service will demonstrate consuming a message from the Message Bus.
+
 ## Setup
 
 If you look to the left, you will see two boxes representing the producer and the consumer.  The lab is looking for both and can’t find them, which means that they aren’t running.  Let’s solve that right now.

@@ -147,7 +147,7 @@ export default function Section3() {
                     <Paper variant={"outlined"} square={false} style={{padding: "1rem", marginTop: "2rem"}} className={"consumer"}>
 
                         <Typography variant="h4" gutterBottom>
-                            First Consumer: {!isFirstConsumerActive && "Offline"}
+                            Consumer 1: {!isFirstConsumerActive && "Offline"}
                         </Typography>
 
                         <Typography variant="h5" gutterBottom fontWeight={"bold"} color={!isFirstConsumerActive ? "lightgray" : firstConsumerGroup === "blue-group" ? "info.main" : "warning.main"}>
@@ -184,7 +184,7 @@ export default function Section3() {
                     <Paper variant={"outlined"} square={false} style={{padding: "1rem", marginTop: "2rem"}} className={"consumer"}>
 
                         <Typography variant="h4" gutterBottom>
-                            Second Consumer: {!isSecondConsumerActive && "Offline"}
+                            Consumer 2: {!isSecondConsumerActive && "Offline"}
                         </Typography>
 
                         <Typography variant="h5" gutterBottom fontWeight={"bold"} color={!isSecondConsumerActive ? "lightgray" : secondConsumerGroup === "blue-group" ? "info.main" : "warning.main"}>

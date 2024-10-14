@@ -80,11 +80,6 @@ export function Main() {
                         <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
                             Hands-on with Event-Driven Architecture
                         </Typography>
-                        <div>
-                            <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
-                                Cisco Live 2024, Las Vegas
-                            </Typography>
-                        </div>
                     </Toolbar>
                 </AppBar>
 

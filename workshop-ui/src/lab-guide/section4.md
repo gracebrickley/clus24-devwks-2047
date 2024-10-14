@@ -1,6 +1,13 @@
 # Section 4: The Saga Pattern
 
-Now, we are going to look at a design pattern called the “Saga Pattern” which is a little more of a complex approach to event driven architecture than what we’ve already looked at.  Before we start, lets discuss two concepts that will be relevant to this section.
+Now, we are going to look at a design pattern called the “Saga Pattern” which is a little more of a complex approach to event driven architecture than what we’ve already looked at.  
+
+## Kafka and Friends
+
+The three services in the `docker-compose.yaml` file relevant to this section are:
+- `provisioner`, `authorizer`, and `notifier`: three consumer/producers that we'll use to illustrate the saga pattern.
+
+Before we start, lets discuss two concepts that will be relevant to this section.
 
 ## Chained Events
 
@@ -49,7 +56,7 @@ In more detail, these services create a mock workflow where:
 6. An event is raised indicating that the new user has been notified
 7. The Provisioner receives the event indicating that the user has been notified and notes that the Saga is completed for that user.
 
-Because this is a workshop, these steps are mocked, but the behavior mimics what would happen in real life in an event-driven architecture system.  This includes an unpredictable lag.  This is because while Kafka guarantees that events arrive in first-in, first-out pattern, there is nothing that guarantees our individual services will finish processing each event in order.
+Because this is a workshop, these steps are mocked, but the behavior mimics what would happen in real life in an event-driven architecture system.  This includes an unpredictable lag.  This is because there is nothing that guarantees our individual services will finish processing each event in order.
 ## Asynchronous Event Flows
 
 To the left, you will see that under the “Onboard New User” button, there is a toggle for “Trace Mode” which is enabled to start for now.  While on, we will be able to trace exactly where each user’s saga is in the cycle, or where the data is in relation to the consumers as they receive events in their step in the workflow.

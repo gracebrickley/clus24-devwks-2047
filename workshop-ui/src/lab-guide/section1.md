@@ -1,6 +1,6 @@
 # Section 1: Welcome and Setting Up
 
-Hi everyone, thanks so much for joining today!  During this presentation, we will be discussing event driven architecture and showing examples of different design patterns.   The goal of today is to demonstrate how event-driven systems behave in different scenarios.
+Thanks so much for joining today!  During this presentation, we will be discussing event driven architecture and showing examples of different design patterns.   The goal of today is to demonstrate how event-driven systems behave in different scenarios.
 
 ## Goals
 
@@ -31,7 +31,7 @@ Here's an example:
 #### Snippet 1.1
 <span class="copy"></span>
 ```sh
-echo "Cisco Live"
+echo "Event-Driven Architecture"
 ```
 
 ### Troubleshooting and Additional Info
@@ -40,9 +40,14 @@ If at any point during the lab, you run into any technical issues, there are tro
 
 ### Our Environment
 
-There is only one terminal command we should need to run, and we will do that together at the root of this repository.  This command will prepare our services in Docker Desktop so that we can just use that tool to stop and start them as we go.  While we will have to run one command in the terminal, most of the work will be done in Docker Desktop and this UI. 
+There are only two terminal commands we should need to run, and we will do that together in this section.  This command will prepare our services in Docker Desktop so that we can just use that tool to stop and start them as we go.  While we will have to run two commands in the terminal, most of the work will be done in Docker Desktop and this UI. 
 
-Kafka is a distributed messaging system that allows applications to publish and subscribe to streams of data called "topics."  A producer is an application that sends data (messages) to a specific topic (or data stream) in Kafka and a consumer is an application that reads messages from a specific topic in Kafka.  A broker is a single server within a Kafka cluster responsible for receiving messages from producers, storing them in partitions within a topic, and delivering them to consumers.  Lastly, Docker is a containerization platform used to run applications like Kafka.
+### A Few Things to Know
+
+- Kafka is a distributed messaging system that allows applications to publish and subscribe to streams of data called "topics."  
+- A producer is an application that sends data (messages) to a specific topic (or data stream) in Kafka and a consumer is an application that reads messages from a specific topic in Kafka.  
+- A broker is a single server within a Kafka cluster responsible for receiving messages from producers, storing them in partitions within a topic, and delivering them to consumers.  
+- Lastly, Docker is a containerization platform used to run applications like Kafka.
 
 ## Exploring the Lab Repo
 
@@ -50,14 +55,10 @@ This workshop leverages the code found in [this repo](https://github.com/gracebr
 
 ### Kafka and Friends
 
-Let’s now take a look at the `docker-compose.yaml` file that has been provided to you.  There are twelve services defined in the file that we will use throughout the lab:
+Inside of the `docker-compose.yaml` file that has been provided to you, there are twelve services defined in the file that we will use throughout the lab. I will introduce each relevant service at the beginning of each section.  To start, lets talk about the first 4:
 - `zookeeper`: this is a management/orchestration service that configures our Kafka brokers to work together. It is necessary to run Kafka, but we won't go into detail or interact with it at all during this workshop.
 - `kafka1` and `kafka2`: these are our two Kafka brokers (configured by zookeeper) that our Producers and Consumers will connect to so that they can pass messages.
 - `kafka-ui`: this tool will help us visualize what is happening inside our Kafka cluster when messages are sent/received.
-- `producer`: this service will help us to send messages to the Message Bus and ultimately our consumers.
-- `primary-consumer`, `blue-consumer`, and `orange-consumer`: these three services will demonstrate how consumers behave and interact with one another given different configurations. 
-- `provisioner`, `authorizer`, and `notifier`: three consumer/producers that we'll use to illustrate the saga pattern in Section 4.
-- `error-consumer`: this service will mimic a way to handle errors in an event-driven system in Section 5.
 
 ### The Python Files
 

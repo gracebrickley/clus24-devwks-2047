@@ -4,11 +4,18 @@ In this section we'll experiment with Consumer Groups to see how multiple consum
 
 The page should look similar to the last, but with an extra, “Second Consumer.”  The Producer and existing, “First Consumer” should still be running from the last section.  
 
+## Kafka and Friends
+
+Let's now introduce two more services in the `docker-compose.yaml` file:
+- `blue-consumer` and `orange-consumer`: similar to the `primary-consumer`, these two services will demonstrate how consumers behave and interact with one another given different configurations.
+
 ## What is a Consumer Group?
 
 First, let’s talk about what a consumer group is.  Kafka keeps track of which consumers are subscribed to specific topics to ensure that each consumer only receives a message once.  In most cloud-based systems, we generally want to ensure high availability.  High availability is a design approach that allows a system to continue operating without failure, even when individual components fail.  This often means running more than one instance of a microservice.
 
-Knowing that, we can arrange multiple consumers into **Consumer Groups**.  Kafka keeps track of which consumer groups are subscribed to a topic, as well as which consumers are a part of which group.  Now, let’s experiment to see how Consumer Groups behave!
+Knowing that, we can arrange multiple consumers into **Consumer Groups**.  Kafka keeps track of which consumer groups are subscribed to a topic, as well as which consumers are a part of which group.  
+
+Now, let’s experiment to see how Consumer Groups behave!
 
 ## Multiple Consumers in the Same Group
 

@@ -4,6 +4,10 @@ In our last section, we'll look at two patterns:
 - The Dead-Letter Queue (aka the DLQ)
 - Fan-In (of which the DLQ is an implementation)
 
+## Kafka and Friends
+
+Finally, let's introduce the last service in the `docker-compose.yaml` file:
+- `error-consumer`: this service will help demonstrate a way to handle errors in an event-driven system.
 
 ## Dead-Letter Queue
 

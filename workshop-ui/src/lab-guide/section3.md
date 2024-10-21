@@ -61,14 +61,6 @@ Notice that each Consumer Group receives each event once.  This is an implementa
 > ### Note
 >This pattern is helpful when there are multiple services that need information from a producer.
 
-## Moving on
-
-We are going to move onto the next section now.  Leave the Producer running, but press the stop button on both Consumers in Docker Desktop and lets click the button to move on to Section 4.
-
-<hr>
-
-## Additional Information
-
 ### Data Unification Within a Consumer Group
 
 If each consumer in a group is tracking its own list of events, we'll have to figure out a mechanism to unify the sum of both consumers' data into a single list.  This is usually done with a data store that both consumers are pushing data into:
@@ -89,14 +81,20 @@ Each consumer group has to be tracked by the brokers, which means more work is b
 
 ### Segmented Fan-Out
 
-It's more likely that there are going to be ways to segment the fan-out, meaning that slight differences in what each consumer from the events they receive will allow you to break up a large fan-out into smaller segments:
+It's more likely that there are going to be ways to segment the fan-out, meaning that slight differences in what each consumer needs from the events they receive will allow you to break up a large fan-out into smaller segments:
 
 <a href="images/s3.4.jpg" class="glightbox">
     <img src="images/s3.4.jpg" alt="Segmented fan-out"/>
 </a>
 
+## Moving on
+
+We are going to move onto the next section now.  Leave the Producer running, but press the stop button on both Consumers in Docker Desktop and lets click the button to move on to Section 4.
+
+<hr>
+
+
 ## Troubleshooting the Consumers
 
 If you notice that only one consumer is receiving messages when both consumers are running in the same consumer group, here are some things to look out for:
-- First check that both Kafka brokers are running.  Run `docker ps -f "name=kafka"` in a Terminal window to see the status of the Kafka containers.
-- Check to ensure that `first-topic` is configured to have **2 Partitions** and a **Replication Factor of 2**.  You can edit this in the [Kafka-UI](http://localhost:8080) by clicking into the Topics panel, selecting `first-topic`, and clicking *Edit Settings* under the three-dot menu in the top-right.
+- First check that both Kafka brokers are running. You can check this by opening Docker Desktop and ensuring that the services `kafka1` and `kafka2` are running as expected.  If one is down, try pressing the 'play' button on that service to restart it.

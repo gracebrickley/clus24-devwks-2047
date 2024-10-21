@@ -65,11 +65,8 @@ We may be using this `consumer.py` file to connect to a local Kafka cluster; but
 
 The `consumer.py` and `consumer-producer/cp.py` files both use a Kafka library called [aiokafka](https://github.com/aio-libs/aiokafka), which uses [asyncio](https://docs.python.org/3/library/asyncio.html) to consume events from Kafka. The reason this is so important, and the reason we're not using the long-standing [kafka-python](https://kafka-python.readthedocs.io/en/master/) library that is used in `producer.py`, is that topic consumption is a blocking process. That means the consumer function itself blocks anything else from happening (e.g. a RESTful API).      
 
-## Troubleshooting the Producer
-[TODO: CHANGE TROUBLESHOOTING ADVICE]
+## Troubleshooting the Producer and the Consumer
 
-If the Producer does not show as connected, check your `KafkaProducer` configuration again, ensuring that it matches what's shown above. Also be sure to check that the RESTful endpoints in the Producer are correctly configured. There should be at least one `GET` endpoint listening at `http://localhost:5000/ping`, which the lab guide uses to determine if the Producer is available.
+If either the Producer or Consumer do not show as connected, check to ensure that the `producer` and `primary-consumer` services in Docker Desktop are running.
 
-## Troubleshooting the Consumer
-
-If the services aren't able to join their consumer groups, then it's likely a problem with the Kafka cluster itself - specifically the topics are assigned to brokers IDs that may not match the active broker IDs. This is usually because the Zookeeper container was run against multiple Kafka containers.  The best way to solve this is to kill *and delete* all of the containers related to the Kafka cluster, and then start it all up again using the Docker command listed above.
+Additionally, if the services aren't able to join their consumer groups, then it's likely a problem with the Kafka cluster itself - specifically the topics are assigned to brokers IDs that may not match the active broker IDs. This is usually because the Zookeeper container was run against multiple Kafka containers.  The best way to solve this is to kill *and delete* all of the containers related to the Kafka cluster, and then start it all up again using the Docker command listed above.

@@ -73,4 +73,4 @@ Another approach is to segment based on possible downstream action.  That is, if
 
 ## Troubleshooting the Error Consumer
 
-If your errors are not showing up, be sure you ran the command exactly as it's listed above, paying particular attention to the `PORT` environment variable.  Each section connects the consumer on a different port to ensure that the consumer is configured for that section. Using a port from a previous section, or using the default port, will not work correctly for this section.  
+If your errors are not showing up, be sure you are running the `error-consumer` service in Docker Desktop as well as all of the services from Section 4. 

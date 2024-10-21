@@ -107,3 +107,13 @@ Now run the `docker compose up` command again:
 ```sh
 docker compose up
 ```
+
+If when you try and press play on the zookeeper service, it crashes immediately, try and run the following command in your terminal:
+
+#### Snippet 1.6
+<span class="copy"></span>
+```sh
+ulimit -c unlimited
+```
+
+and then attempt to re-run the **docker compose up** command listed in code snippet 1.5.

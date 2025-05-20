@@ -42,6 +42,60 @@ export default function Section4() {
     const [sagaTraces, setSagaTraces] = useState<{ [key: string]: any }[]>([])
 
     useEffect(() => {
+        const uid = sessionStorage.getItem('UID')
+        axios.post(`${PROVISIONER_URL}/start-consumer`, { topic: uid + "new-user", error: false }).then(res => {
+            if (res.status === 200) {
+                console.log("section 4 provisioner consuming from topic new-user")
+            }
+        }).catch(() => {
+            console.log("section 4 provisioner failed to consume from topic new-user")
+        })
+        axios.post(`${PROVISIONER_URL}/start-consumer`, { topic: uid + "notified", error: false }).then(res => {
+            if (res.status === 200) {
+                console.log("section 4 provisioner consuming from topic notified")
+            }
+        }).catch(() => {
+            console.log("section 4 provisioner failed to consume from topic notified")
+        })
+        axios.post(`${PROVISIONER_URL}/start-producer`, { topic: uid + "authorize", error: false }).then(res => {
+            if (res.status === 200) {
+                console.log("section 4 provisioner producing to topic authorize")
+            }
+        }).catch(() => {
+            console.log("section 4 provisioner failed to produce to topic authorize")
+        })
+
+        axios.post(`${AUTHORIZER_URL}/start-consumer`, { topic: uid + "authorize", error: false }).then(res => {
+            if (res.status === 200) {
+                console.log("section 4 authorizer consuming from topic authorize")
+            }
+        }).catch(() => {
+            console.log("section 4 authorizer failed to consume from topic authorize")
+        })
+        axios.post(`${AUTHORIZER_URL}/start-producer`, { topic: uid + "notify", error: false }).then(res => {
+            if (res.status === 200) {
+                console.log("section 4 authorizer producing to topic notify")
+            }
+        }).catch(() => {
+            console.log("section 4 authorizer failed to produce to topic notify")
+        })
+
+        axios.post(`${NOTIFIER_URL}/start-consumer`, { topic: uid + "notify", error: false }).then(res => {
+            if (res.status === 200) {
+                console.log("section 4 notifier consuming from topic notify")
+            }
+        }).catch(() => {
+            console.log("section 4 notifier failed to consume from topic notify")
+        })
+        axios.post(`${NOTIFIER_URL}/start-producer`, { topic: uid + "notified", error: false }).then(res => {
+            if (res.status === 200) {
+                console.log("section 4 notifier producing to topic notified")
+            }
+        }).catch(() => {
+            console.log("section 4 notifier failed to produce to topic notified")
+        });
+    }, [])
+    useEffect(() => {
         const producerInt = setInterval(() => {
             axios.get(`${PRODUCER_URL}/ping`).then(res => {
                 if (res.status === 200) {
@@ -54,8 +108,11 @@ export default function Section4() {
         }, POLLING_INTERVAL)
         const sagaInt = setInterval(async () => {
             const activeServiceTrackers = [setProvisionerActive, setAuthorizerActive, setNotifierActive]
+            const provisionerQueryParams = `?prefix=${sessionStorage.getItem('UID')}&topic=new-user`
+            const authorizerQueryParams = `?prefix=${sessionStorage.getItem('UID')}&topic=authorize`
+            const notifierQueryParams = `?prefix=${sessionStorage.getItem('UID')}&topic=notify`
             const responses = await Promise.allSettled([
-                axios.get(`${PROVISIONER_URL}`), axios.get(`${AUTHORIZER_URL}`), axios.get(`${NOTIFIER_URL}`)
+                axios.get(`${PROVISIONER_URL}${provisionerQueryParams}`), axios.get(`${AUTHORIZER_URL}${authorizerQueryParams}`), axios.get(`${NOTIFIER_URL}${notifierQueryParams}`)
             ]);
             let traces = [...sagaTraces]
             for (let i = 0; i < responses.length; i++) {
@@ -66,13 +123,21 @@ export default function Section4() {
                     activeServiceTrackers[i](true)
                 }
                 //@ts-ignore
-                const val = responses[i].value
-                Object.keys(val.data).forEach((key: string) => {
-                    const prop: string = topicToPropertyMap[key]
-                    val.data[key].forEach((user: { [key: string]: any }) => {
-                        traces = traces.map(trace => trace.id === user.id ? Object.assign({}, {[prop]: true}, trace) : trace)
-                    })
-                })
+                const val = responses[i]?.value
+                if (val?.data?.length !== 0) {
+                    let updatedTraces = [...traces]; // Safely capture the current state of traces
+                    val.data.forEach((userString: string) => {
+                        const user = JSON.parse(userString) // { [key: string]: any }
+                        const prop: string = topicToPropertyMap[user.topic]
+                        updatedTraces = updatedTraces.map((trace) => {
+                            if (trace.id === user.id) {
+                                return Object.assign({}, {[prop]: true}, trace);
+                            }
+                            return trace;
+                        });
+                    });
+                    traces = updatedTraces; // Update traces after processing
+                }
             }
 
             setSagaTraces(traces)
@@ -85,6 +150,7 @@ export default function Section4() {
 
     async function sendEvent() {
         await ProducerService.postEvent({
+            prefix: sessionStorage.getItem('UID'),
             topic: "new-user",
             id: nextUserIndex,
             ...userEntries[nextUserIndex][1]

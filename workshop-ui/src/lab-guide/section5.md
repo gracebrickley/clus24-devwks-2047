@@ -31,7 +31,7 @@ Although this doesn’t seem too different from the last section, it is importan
 
 The **Users** display is a simplified version of what we used in Section 4, simply meant to show users in either the *pending* or *complete* state.
 
-Let’s open Docker Desktop and click the start button on the service called `error-consumer` and click the **Onboard New User** button to send a few users to be onboarded.  Feel free to send all 10 users!
+Let’s click the **Onboard New User** button to send a few users to be onboarded.  Feel free to send all 10 users!
 
 Because they are the same services from last section, there is the same built-in delay in how the users are onboarded.  Some users will take longer than others to complete, but some will never complete.  
 
@@ -59,9 +59,7 @@ You may notice that this builds on system design that was shared in the **Additi
 
 ## Closing Up
 
-At this point, we are wrapping up the workshop so we can shut down all of our services.  Let’s go into Docker Desktop one last time and stop all the containers that are running.  
-
-Thank you so much for joining this workshop and learning about event-driven architecture with me!
+At this point, we are wrapping up the workshop.  Thank you so much for joining this workshop and learning about event-driven architecture with me!
 
 ## Additional Information
 
@@ -70,7 +68,3 @@ Thank you so much for joining this workshop and learning about event-driven arch
 A common way to segment DLQs is to separate certain errors according to who (that is, which teams, or which stakeholders) are interested in those errors.  That likely means which teams will be responsible for triaging and remediating those errors.  
 
 Another approach is to segment based on possible downstream action.  That is, if it's a manual remediation, or if there are possible downstream consumers and additional automation.  
-
-## Troubleshooting the Error Consumer
-
-If your errors are not showing up, be sure you are running the `error-consumer` service in Docker Desktop as well as all of the services from Section 4. 

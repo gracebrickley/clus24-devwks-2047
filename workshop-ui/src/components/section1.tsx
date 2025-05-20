@@ -9,6 +9,7 @@ import {ProducerService} from "../services/producer.srvc";
 
 async function sendEvent() {
     await ProducerService.postEvent({
+        prefix: sessionStorage.getItem('UUID'),
         this: "that",
         those: "them"
     })

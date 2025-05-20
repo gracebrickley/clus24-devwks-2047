@@ -1,18 +1,18 @@
 # Section 1: Welcome and Setting Up
 
-Thanks so much for joining today!  During this presentation, we will be discussing event driven architecture and showing examples of different design patterns.   The goal of today is to demonstrate how event-driven systems behave in different scenarios.
+Thanks so much for joining today!  During this lab, you will learn about event driven architecture and be shown examples of different design patterns.   The goal of today is to demonstrate how event-driven systems behave in different scenarios.
 
 ## Goals
 
 This lab is meant to introduce you to different design patterns in event-driven architecture. Each section implements a different pattern, building on previous sections.
 
-To start, we will set up our lab environment and look at what has been provided for us!  Also, if you have not already done so, go ahead and prepare for the workshop by downloading Docker Desktop [here](https://www.docker.com/products/docker-desktop/).
+To start, we will dig into our lab environment and discuss what has been provided for us!
 
 ## Lab Guide and Conventions
 
 ### Layout
 
-There will be five total sections of the lab, the first being this one for set up.  Each section will focus on one or two aspects of event-driven architecture.  There will be some interactive content on the left-hand side and text, images, or code snippets on the right.  Feel free to read as we go or follow along!
+There will be five total sections of the lab, the first being this one for set up.  Each section will focus on one or two aspects of event-driven architecture.  There will be some interactive content on the left-hand side and text, images, or code snippets on the right.  The text on the right-hand side will walk you through the interactive content on the left.
 
 ### Navigation
 
@@ -22,25 +22,13 @@ Each of the five sections in this workshop has its own page.  To navigate betwee
 
 All of the images in the provided text are viewable in a pop-out window, which will show those images at their full size.  Some of the images that you'll come across are no bigger than what is displayed in the guide, while others are much bigger, and are better when viewed in their expanded display.
 
-### Copying Code Snippets
-
-For the most part, we will be using Docker Desktop to help us demonstrate in each section, but the code to run each example is included in a code snippet box that can be copied if you want to experiment.  Clicking on the copy icon in the right side of the box will copy the code to your clipboard, so you can paste wherever you need.
-
-Here's an example:
-
-#### Snippet 1.1
-<span class="copy"></span>
-```sh
-echo "Event-Driven Architecture"
-```
-
 ### Troubleshooting and Additional Info
 
-If at any point during the lab, you run into any technical issues, there are troubleshooting pointers at the bottom of each page for each section.  If you are unable to solve the problem using those pointers, please raise your hand and we will try to assist you.  There is also additional information at the bottom of each section if you'd like to learn more.
+If at any point during the lab, you run into any technical issues, please raise your hand and we will try to assist you.  There is also additional information at the bottom of each section if you'd like to learn more.
 
 ### Our Environment
 
-There are only two terminal commands we should need to run, and we will do that together in this section.  This command will prepare our services in Docker Desktop so that we can just use that tool to stop and start them as we go.  While we will have to run two commands in the terminal, most of the work will be done in Docker Desktop and this UI. 
+All of the services that you will interact with today are running inside Docker containers that are deployed using Kubernetes. You will not have to start or stop them using any tool other than this UI. The Dockerfiles to create these Docker containers can be found in the github page [linked here](https://github.com/gracebrickley/clus24-devwks-2047) if you want to dig deeper.
 
 ### A Few Things to Know
 
@@ -55,18 +43,18 @@ This workshop leverages the code found in [this repo](https://github.com/gracebr
 
 ### Kafka and Friends
 
-Inside of the `docker-compose.yaml` file that has been provided to you, there are twelve services defined in the file that we will use throughout the lab. I will introduce each relevant service at the beginning of each section.  To start, lets talk about the first 4:
+Inside of the `docker-compose.yaml` file that has been provided to you in the github linked above, there are twelve services defined that we will use throughout the lab. I will introduce each relevant service at the beginning of each section.  To start, lets talk about the first 4:
 - `zookeeper`: this is a management/orchestration service that configures our Kafka brokers to work together. It is necessary to run Kafka, but we won't go into detail or interact with it at all during this workshop.
 - `kafka1` and `kafka2`: these are our two Kafka brokers (configured by zookeeper) that our Producers and Consumers will connect to so that they can pass messages.
 - `kafka-ui`: this tool will help us visualize what is happening inside our Kafka cluster when messages are sent/received.
 
-### The Python Files
+### The Go Files
 
-The python code running in the background to help our services run is available to view at this repo: [this repo](https://github.com/gracebrickley/clus24-devwks-2047). We won’t be diving into the specifics of the code, but it is included in case you want to take a look at how the sandbox services work under the hood after the workshop.
+The golang code running in the background to help our services run is available to view at this repo: [this repo](https://github.com/gracebrickley/clus24-devwks-2047/consumer-producer-go). We won’t be diving into the specifics of the code, but it is included in case you want to take a look at how the sandbox services work under the hood after the workshop.
 
 ## Running the Kafka Cluster
 
-If we are all ready to go, we are now going to run our Kafka Cluster.  Let’s copy this code snippet to our clipboard:  
+If you were to run this locally (which we won't be doing in this lab), these are the two terminal commands that would be needed to get the Kafka Cluster up and running:  
 
 #### Snippet 1.2
 <span class="copy"></span>
@@ -80,40 +68,12 @@ curl -O https://raw.githubusercontent.com/gracebrickley/clus24-devwks-2047/main/
 docker compose up
 ```
 
-Now, paste the code snippets into the terminal in a folder one at a time and click “enter.”  This may take a few seconds to run.
-
-Please open Docker Desktop and look at all our services.  There should be 4 out of 12 running (`zookeeper`, `kafka-ui`, `kafka1`, and `kafka2`).
-
-Now that we have verified that everything is up and running, lets checkout what’s happening by jumping into the [Kafka UI](http://localhost:8080).  The first page that pops up is the Dashboard with a single cluster listed called “local”.  We can also see this cluster listed in the navigation menu to the left.
+Let's now checkout what’s happening by jumping into the [Kafka UI](http://localhost:8080).  The first page that pops up is the Dashboard with a single cluster listed called “local”.  We can also see this cluster listed in the navigation menu to the left.
 
 <a href="images/s1.1.png" class="glightbox">
     <img src="images/s1.1.png" alt="Kafka UI Dashboard"/>
 </a>
 
-Now, click on the local cluster’s **Topics** to explore.  As you can see, there are no topics listed yet.  As we send messages, topics will be automatically created for us that producers will send messages to, and consumers will consume messages from.
+Now, click on the local cluster’s **Topics** to explore.  You will see that there are no topics listed yet.  As we send messages, topics will be automatically created for us that producers will send messages to, and consumers will consume messages from.  All of the topics will have a unique identifier prefixed to them so that you are able to filter for only your messages.  You can find your identifier in the next section and can apply the filter by pasting this into the search bar in the Kafka UI Topics tab.
 
 There is a way to preconfigure topics as well, but for the purposes of this lab, we have auto-create enabled in the `docker-compose.yaml` file.
-
-## Troubleshooting the Kafka Services
-
-If either of the Kafka brokers are not running, or if the topics are showing error statuses for their partitions, the best way to solve this problem is to stop the Kafka services by pressing the "stop" button in Docker Desktop. Then, select the checkbox and press the trash button to remove the existing containers.
-
-This will remove the containers *and remove their temporary storage space on disk,* which is likely the cause of any services crashing due to stale data from a previous run.
-
-Now run the `docker compose up` command again:
-
-#### Snippet 1.5
-<span class="copy"></span>
-```sh
-docker compose up
-```
-
-If when you try and press play on the zookeeper service, it crashes immediately, try and run the following command in your terminal:
-
-#### Snippet 1.6
-<span class="copy"></span>
-```sh
-ulimit -c unlimited
-```
-
-and then attempt to re-run the **docker compose up** command listed in code snippet 1.5.

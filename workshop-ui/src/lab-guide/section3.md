@@ -2,12 +2,12 @@
 
 In this section we'll experiment with Consumer Groups to see how multiple consumers handle events on the same topic.
 
-The page should look similar to the last, but with an extra, “Second Consumer.”  The Producer and existing, “First Consumer” should still be running from the last section.  
+The page should look similar to the last, but with an extra, “Second Consumer.”  The Producer should still be running from the last section.  
 
 ## Kafka and Friends
 
 Let's now introduce two more services in the `docker-compose.yaml` file:
-- `blue-consumer` and `orange-consumer`: similar to the `primary-consumer`, these two services will demonstrate how consumers behave and interact with one another given different configurations.
+- `blue-consumer` and `orange-consumer`: similar to the `primary-consumer` (from the last section), these two services will demonstrate how consumers behave and interact with one another given different configurations.
 
 ## What is a Consumer Group?
 
@@ -19,7 +19,7 @@ Now, let’s experiment to see how Consumer Groups behave!
 
 ## Multiple Consumers in the Same Group
 
-First, let’s start up the second Consumer.  We need to go into Docker Desktop and click the play button for the container that’s named `blue-consumer`.  Once this consumer is up and running, the workshop UI should show the group for the second Consumer as `blue-group` in blue text.  
+First, let’s start up the first and second Consumers.  Press the `Start Listener` button in the First Consumer panel.  Additionally, press the `Start Blue` button in the Second Consumer panel. Once both of these consumers are up and running, the workshop UI should show the group for the both Consumers as `blue-group` in blue text.  
 
 The system now looks like this:
 
@@ -33,18 +33,18 @@ Click the **Send Event** button a few times and watch what happens.
 
 As you can see, the events are split between the two Consumers!  This happens because Kafka knows that both Consumers are in the same Consumer Group and splits events between them.  There is an option to configure how events are distributed among Consumers in a Consumer Group but we are using the default which is a *roughly* even distribution.
 
-> ### Discussion
+> ### Something to Think About
 > What is the benefit of having multiple consumer instances in the same group?
 
 ### Downscaling (or Crashing) an Instance
 
-Now, let’s mimic what would happen if one of our instances were to crash.  Go ahead and go into Docker Desktop and press the stop button on the container named `blue-consumer`.  Then, go back to the workshop UI and send a few more events.  
+Now, let’s mimic what would happen if one of our instances were to crash.  Go ahead and press the `Stop Blue` button in the Second Consuner panel and wait for the UI to show it as offline.  Then, go back to producer panel and send a few more events.  
 
 We can see that Kafka sends all events to the First Consumer because it knows that the Second Consumer is offline.  This is good in terms of high availability because no events/messages are lost in the case of component failure.
 
 ## Different Groups, the Fan-Out Pattern
 
-Next, we are going to start the second consumer again, but this time it will be a part of a **different Consumer Group**.  Go into Docker Desktop and start the container named `orange-consumer`.  Once you see that the Second Consumer is online again, it should also say it is a part of the `orange-group`.  Now, the system looks like this:
+Next, we are going to start the second consumer again, but this time it will be a part of a **different Consumer Group**.  Now, press the `Start Orange` button in the Second Consumer panel.  Once you see that the Second Consumer is online again, it should also say it is a part of the `orange-group`.  Now, the system looks like this:
 
 <a href="images/s3.2.jpg" class="glightbox">
     <img src="images/s3.2.jpg" alt="Two consumers in different consumer groups"/>
@@ -89,12 +89,6 @@ It's more likely that there are going to be ways to segment the fan-out, meaning
 
 ## Moving on
 
-We are going to move onto the next section now.  Leave the Producer running, but press the stop button on both Consumers in Docker Desktop and lets click the button to move on to Section 4.
+We are going to move onto the next section now.  Press the stop button on both Consumers and lets click the button to move on to Section 4.
 
 <hr>
-
-
-## Troubleshooting the Consumers
-
-If you notice that only one consumer is receiving messages when both consumers are running in the same consumer group, here are some things to look out for:
-- First check that both Kafka brokers are running. You can check this by opening Docker Desktop and ensuring that the services `kafka1` and `kafka2` are running as expected.  If one is down, try pressing the 'play' button on that service to restart it.

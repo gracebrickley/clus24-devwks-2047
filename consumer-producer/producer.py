@@ -23,9 +23,10 @@ producer = KafkaProducer(
 def receive_event():  # put application's code here
     request_data = request.get_json()
     request_data["produced"] = get_pretty_time_with_milliseconds()
-    topic = "first-topic"
+    prefix = request_data["prefix"]
+    topic = prefix + "first-topic"
     if "topic" in request_data:
-        topic = request_data["topic"]
+        topic = prefix + request_data["topic"]
     producer.send(topic, request_data)
     producer.flush(timeout=5)
     return ""
@@ -45,6 +46,6 @@ def get_pretty_time_with_milliseconds():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=os.environ.get("PORT", 8888), host=os.environ.get("HOST", "127.0.0.1"))
 
 

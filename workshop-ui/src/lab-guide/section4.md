@@ -63,13 +63,11 @@ To the left, you will see that under the “Onboard New User” button, there is
 
 ## Our Pre-Packaged Consumers
 
-Now that we’ve learned about the two concepts behind this design pattern and looked at the architecture diagram of the design, lets experiment with demonstrating it!  
+Now that we’ve learned about the two concepts behind this design pattern and looked at the architecture diagram of the design, lets experiment with demonstrating it!
 
-Open back up Docker Desktop and click the play button on the containers named `provisioner`, `authorizer`, and `notifier`.  These will help us illustrate the saga pattern.
+Click the **Onboard New User** button several times to see how the data flows asynchronously across the services.
 
-Once we have those up and running, click the **Onboard New User** button several times to see how the data flows asynchronously across the services.
-
-As you can see, different sets of data don’t complete in order.  This would likely happen in a production environment where multiple producers and consumer groups are handling hundreds or thousands of data points each second.  
+As you can see, different sets of data don’t complete in order.  This would likely happen in a production environment where multiple producers and consumer groups are handling hundreds or thousands of data points each second.
 
 ## Lack of Visibility
 
@@ -85,7 +83,7 @@ Isn’t it a little nerve-wracking not knowing what’s happening?  Here is a qu
 
 ## Moving on
 
-For the next section, let’s leave the Producer and these services running.  We will build on these for Section 5.  When you’re ready, click the button to move onto the next section.
+For the next section, we will build on all of these services.  When you’re ready, click the button to move onto the next section.
 
 <hr>
 
@@ -101,10 +99,4 @@ In this section, we looked at a *closed-loop* saga, meaning every event contribu
 
 ### Fully vs Partially Automated Systems
 
-Usually we want our event-driven systems to automate as much of a workflow as possible.  However, it is entirely valid to create a partially-automated system, with a manual step being added to a certain part of the workflow.  Ticketing systems - e.g. helpdesk ticket tracking - are an example of a partially-automated workflow. A ticket ca be created, categorized, prioritized, and assigned using chained events, but the actual work on that ticket is manual.  Once the ticket is marked as complete, a notification can be sent to the stakeholder, analytics can be performed on the ticket time, and a new ticket can be assigned, all with downstream automation. 
-
-## Troubleshooting the Docker Services
-
-If you're having trouble getting events to show up in the trace table above, there may be a problem with your Docker containers.  Make sure that when you start up the different containers, you already have `zookeeper`, `kafka1` and `kafka2` running.  The services for this section are not meant to be spun up at the same time as the core Kafka services, as there is a delay in Kafka coming up vs being consumer-ready that causes the saga-focused services to crash.
-
-Alternatively, (and this is repeated from Section 2) if the services aren't able to join their consumer groups, then it's likely a problem with the Kafka cluster itself. This is usually because the Zookeeper container was run against multiple Kafka containers.  The best way to solve this is to kill all of the containers related to the Kafka cluster, and then start it all up again using the Docker command listed in Section 2.   
+Usually we want our event-driven systems to automate as much of a workflow as possible.  However, it is entirely valid to create a partially-automated system, with a manual step being added to a certain part of the workflow.  Ticketing systems - e.g. helpdesk ticket tracking - are an example of a partially-automated workflow. A ticket can be created, categorized, prioritized, and assigned using chained events, but the actual work on that ticket is manual.  Once the ticket is marked as complete, a notification can be sent to the stakeholder, analytics can be performed on the ticket time, and a new ticket can be assigned, all with downstream automation. 

@@ -1,18 +1,19 @@
 import axios from "axios";
-import {PRODUCER_URL} from "../config/constants";
+import { FIRST_CONSUMER_URL, PRODUCER_URL } from "../config/constants";
 
 export class ProducerService {
     static getPrettyTime(): string {
-        const d = new Date()
-        return d.toLocaleTimeString("en-US", { hour12: false }) + `:${d.getMilliseconds()}`
+        const d = new Date();
+        return d.toLocaleTimeString("en-US", { hour12: false }) + `:${d.getMilliseconds()}`;
     }
 
-    static async postEvent(event: any){
-        return axios.post(PRODUCER_URL, event)
+    static async postEvent(event: any) {
+        const queryString = `?prefix=${event?.prefix}&topic=${event?.topic}`
+        return axios.post(`${PRODUCER_URL}${queryString}`, event);
     }
 
-    static fetchUsers(): {[key: string]: Object} {
-        return  {
+    static fetchUsers(): { [key: string]: Object } {
+        return {
             'elroy': {
                 'id': 'elroy',
                 'name': "Elroy Winterbone",
@@ -83,6 +84,26 @@ export class ProducerService {
                 'email': "jocelyn@company.com",
                 'device': "ipad"
             },
+        };
+    }
+
+    // New function to start a listener
+    static async startListener(topic: string, url: string): Promise<void> {
+        try {
+            const response = await axios.post(`${url}/start-listener`, { topic });
+            console.log(`Listener started for topic: ${topic}`, response.data);
+        } catch (error) {
+            console.error(`Failed to start listener for topic: ${topic}`,(error as any).response?.data || (error as any).message);
+        }
+    }
+
+    // New function to stop a listener
+    static async stopListener(topic: string, url: string): Promise<void> {
+        try {
+            const response = await axios.post(`${url}/stop-listener`, { topic });
+            console.log(`Listener stopped for topic: ${topic}`, response.data);
+        } catch (error) {
+            console.error(`Failed to stop listener for topic: ${topic}`, (error as any).response?.data || (error as any).message);
         }
     }
 }

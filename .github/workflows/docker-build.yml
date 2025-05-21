@@ -1,0 +1,65 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  CONSUMER_IMAGE_NAME: ${{ github.repository }}/wil-consumer
+  CP_IMAGE_NAME: ${{ github.repository }}/wil-cp
+  PRODUCER_IMAGE_NAME: ${{ github.repository }}/wil-producer
+  UI_IMAGE_NAME: ${{ github.repository }}/wil-ui
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Consumer image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile_consumer
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.CONSUMER_IMAGE_NAME }}:latest
+
+      - name: Build and push CP image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile_cp
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.CP_IMAGE_NAME }}:latest
+
+      - name: Build and push Producer image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile_producer
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.PRODUCER_IMAGE_NAME }}:latest
+
+      - name: Build and push UI image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./workshop-ui
+          file: ./workshop-ui/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}:latest 

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-app-config
+data:
+  BOOTSTRAP_SERVERS: "kafka.default.svc.cluster.local:9092"
+  HOST: "0.0.0.0"
+
+  # Consumer Configuration
+  CONSUMER_PRIMARY_TOPIC: "first-topic"
+  CONSUMER_PRIMARY_GROUP: "blue-group"
+  CONSUMER_BLUE_GROUP: "blue-group"
+  CONSUMER_ORANGE_GROUP: "orange-group"
+  CONSUMER_ORANGE_OFFSET_RESET: "latest"
+  CONSUMER_ERROR_TOPIC: "dlq"
+  CONSUMER_ERROR_GROUP: "error-group"
+
+  # Provisioner Configuration
+  PROVISIONER_CONSUMER_TOPICS: "new-user,notified"
+  PROVISIONER_CONSUMER_GROUP: "notifier-group"
+  PROVISIONER_PRODUCER_TOPIC: "authorize"
+
+  # Authorizer Configuration
+  AUTHORIZER_CONSUMER_TOPICS: "authorize"
+  AUTHORIZER_CONSUMER_GROUP: "authorizer-group"
+  AUTHORIZER_PRODUCER_TOPIC: "notify"
+
+  # Notifier Configuration
+  NOTIFIER_CONSUMER_TOPICS: "notify"
+  NOTIFIER_CONSUMER_GROUP: "notifier-group"
+  NOTIFIER_PRODUCER_TOPIC: "notified" 

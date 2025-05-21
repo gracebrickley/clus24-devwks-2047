@@ -35,24 +35,24 @@ jobs:
       - name: Build and push Consumer image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./consumer-producer-go/Dockerfile_consumer
+          context: ./consumer-producer-go
+          file: ./Dockerfile_consumer
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.CONSUMER_IMAGE_NAME }}:latest
 
       - name: Build and push CP image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./consumer-producer-go/Dockerfile_cp
+          context: ./consumer-producer-go
+          file: ./Dockerfile_cp
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.CP_IMAGE_NAME }}:latest
 
       - name: Build and push Producer image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./consumer-producer-go/Dockerfile_producer
+          context: ./consumer-producer-go
+          file: ./Dockerfile_producer
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.PRODUCER_IMAGE_NAME }}:latest
 

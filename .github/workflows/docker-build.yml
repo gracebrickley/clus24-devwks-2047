@@ -36,7 +36,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./consumer-producer-go
-          file: ./Dockerfile_consumer
+          file: ./consumer-producer-go/Dockerfile_consumer
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.CONSUMER_IMAGE_NAME }}:latest
 
@@ -44,7 +44,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./consumer-producer-go
-          file: ./Dockerfile_cp
+          file: ./consumer-producer-go/Dockerfile_cp
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.CP_IMAGE_NAME }}:latest
 
@@ -52,7 +52,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./consumer-producer-go
-          file: ./Dockerfile_producer
+          file: ./consumer-producer-go/Dockerfile_producer
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.PRODUCER_IMAGE_NAME }}:latest
 

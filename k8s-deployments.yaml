@@ -1,0 +1,430 @@
+---
+# Producer Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+  labels:
+    app: producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+    spec:
+      containers:
+      - name: producer
+        image: ghcr.io/gracebrickley/producer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8888
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
+        - name: PORT
+          value: "8888"
+        - name: HOST
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: HOST
+---
+# Producer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: producer
+spec:
+  selector:
+    app: producer
+  ports:
+  - port: 8888
+    targetPort: 8888
+  type: NodePort
+---
+# Primary Consumer Go Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: primary-consumer-go
+  labels:
+    app: primary-consumer-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: primary-consumer-go
+  template:
+    metadata:
+      labels:
+        app: primary-consumer-go
+    spec:
+      containers:
+      - name: primary-consumer-go
+        image: ghcr.io/gracebrickley/consumer-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
+        - name: KAFKA_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: CONSUMER_PRIMARY_TOPIC
+        - name: CONSUMER_GROUP
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: CONSUMER_PRIMARY_GROUP
+        - name: PORT
+          value: "8000"
+---
+# Primary Consumer Go Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: primary-consumer-go
+spec:
+  selector:
+    app: primary-consumer-go
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: NodePort
+---
+# Blue Consumer Go Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue-consumer-go
+  labels:
+    app: blue-consumer-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blue-consumer-go
+  template:
+    metadata:
+      labels:
+        app: blue-consumer-go
+    spec:
+      containers:
+      - name: blue-consumer-go
+        image: ghcr.io/gracebrickley/consumer-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8001
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
+        - name: CONSUMER_GROUP
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: CONSUMER_BLUE_GROUP
+        - name: PORT
+          value: "8001"
+---
+# Blue Consumer Go Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue-consumer-go
+spec:
+  selector:
+    app: blue-consumer-go
+  ports:
+  - port: 8001
+    targetPort: 8001
+  type: NodePort
+---
+# Orange Consumer Go Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orange-consumer-go
+  labels:
+    app: orange-consumer-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orange-consumer-go
+  template:
+    metadata:
+      labels:
+        app: orange-consumer-go
+    spec:
+      containers:
+      - name: orange-consumer-go
+        image: ghcr.io/gracebrickley/consumer-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8002
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
+        - name: CONSUMER_GROUP
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: CONSUMER_ORANGE_GROUP
+        - name: PORT
+          value: "8002"
+        - name: AUTO_OFFSET_RESET
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: CONSUMER_ORANGE_OFFSET_RESET
+---
+# Orange Consumer Go Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: orange-consumer-go
+spec:
+  selector:
+    app: orange-consumer-go
+  ports:
+  - port: 8002
+    targetPort: 8002
+  type: NodePort
+---
+# Error Consumer Go Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: error-consumer-go
+  labels:
+    app: error-consumer-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: error-consumer-go
+  template:
+    metadata:
+      labels:
+        app: error-consumer-go
+    spec:
+      containers:
+      - name: error-consumer-go
+        image: ghcr.io/gracebrickley/consumer-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8084
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
+        - name: KAFKA_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: CONSUMER_ERROR_TOPIC
+        - name: CONSUMER_GROUP
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: CONSUMER_ERROR_GROUP
+        - name: PORT
+          value: "8084"
+---
+# Error Consumer Go Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: error-consumer-go
+spec:
+  selector:
+    app: error-consumer-go
+  ports:
+  - port: 8084
+    targetPort: 8084
+  type: NodePort
+---
+# Provisioner Go Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: provisioner-go
+  labels:
+    app: provisioner-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: provisioner-go
+  template:
+    metadata:
+      labels:
+        app: provisioner-go
+    spec:
+      containers:
+      - name: provisioner-go
+        image: ghcr.io/gracebrickley/provisioner-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+        env:
+        - name: PORT
+          value: "8081"
+        - name: CONSUMER_TOPICS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: PROVISIONER_CONSUMER_TOPICS
+        - name: CONSUMER_GROUP
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: PROVISIONER_CONSUMER_GROUP
+        - name: PRODUCER_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: PROVISIONER_PRODUCER_TOPIC
+---
+# Provisioner Go Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: provisioner-go
+spec:
+  selector:
+    app: provisioner-go
+  ports:
+  - port: 8081
+    targetPort: 8081
+  type: NodePort
+---
+# Authorizer Go Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authorizer-go
+  labels:
+    app: authorizer-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authorizer-go
+  template:
+    metadata:
+      labels:
+        app: authorizer-go
+    spec:
+      containers:
+      - name: authorizer-go
+        image: ghcr.io/gracebrickley/authorizer-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+        env:
+        - name: CONSUMER_TOPICS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: AUTHORIZER_CONSUMER_TOPICS
+        - name: CONSUMER_GROUP
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: AUTHORIZER_CONSUMER_GROUP
+        - name: PRODUCER_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: AUTHORIZER_PRODUCER_TOPIC
+        - name: PORT
+          value: "8082"
+---
+# Authorizer Go Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: authorizer-go
+spec:
+  selector:
+    app: authorizer-go
+  ports:
+  - port: 8082
+    targetPort: 8082
+  type: NodePort
+---
+# Notifier Go Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifier-go
+  labels:
+    app: notifier-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifier-go
+  template:
+    metadata:
+      labels:
+        app: notifier-go
+    spec:
+      containers:
+      - name: notifier-go
+        image: ghcr.io/gracebrickley/notifier-go:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+        env:
+        - name: CONSUMER_TOPICS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: NOTIFIER_CONSUMER_TOPICS
+        - name: CONSUMER_GROUP
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: NOTIFIER_CONSUMER_GROUP
+        - name: PRODUCER_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: NOTIFIER_PRODUCER_TOPIC
+        - name: PORT
+          value: "8083"
+---
+# Notifier Go Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifier-go
+spec:
+  selector:
+    app: notifier-go
+  ports:
+  - port: 8083
+    targetPort: 8083
+  type: NodePort 

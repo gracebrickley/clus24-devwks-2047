@@ -43,6 +43,9 @@ func main() {
 	// Endpoint to stop a consumer
 	mux.HandleFunc("/stop-consumer", StopConsumerHandler)
 
+    // Endpoint to ping the service
+    mux.HandleFunc("/ping", PingHandler)
+
 	// Endpoint to fetch messages
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		prefix := r.URL.Query().Get("prefix")
@@ -385,6 +388,10 @@ func corsMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func PingHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "pong:%s", os.Getenv("CONSUMER_GROUP"))
 }
 
 func shouldRaiseError() bool {

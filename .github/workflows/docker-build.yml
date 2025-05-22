@@ -51,8 +51,8 @@ jobs:
       - name: Build and push Producer image
         uses: docker/build-push-action@v5
         with:
-          context: ./consumer-producer-go
-          file: ./consumer-producer-go/Dockerfile_producer
+          context: ./consumer-producer
+          file: ./consumer-producer/Dockerfile_producer
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.PRODUCER_IMAGE_NAME }}:latest
 

@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: producer
-        image: ghcr.io/gracebrickley/producer:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-producer:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8888
@@ -68,7 +68,7 @@ spec:
     spec:
       containers:
       - name: primary-consumer-go
-        image: ghcr.io/gracebrickley/consumer-go:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-consumer:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
@@ -123,7 +123,7 @@ spec:
     spec:
       containers:
       - name: blue-consumer-go
-        image: ghcr.io/gracebrickley/consumer-go:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-consumer:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8001
@@ -173,7 +173,7 @@ spec:
     spec:
       containers:
       - name: orange-consumer-go
-        image: ghcr.io/gracebrickley/consumer-go:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-consumer:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8002
@@ -228,7 +228,7 @@ spec:
     spec:
       containers:
       - name: error-consumer-go
-        image: ghcr.io/gracebrickley/consumer-go:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-consumer:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8084
@@ -283,7 +283,7 @@ spec:
     spec:
       containers:
       - name: provisioner-go
-        image: ghcr.io/gracebrickley/provisioner-go:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-cp:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8081
@@ -338,7 +338,7 @@ spec:
     spec:
       containers:
       - name: authorizer-go
-        image: ghcr.io/gracebrickley/authorizer-go:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-cp:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8082
@@ -393,7 +393,7 @@ spec:
     spec:
       containers:
       - name: notifier-go
-        image: ghcr.io/gracebrickley/notifier-go:latest
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-cp:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8083

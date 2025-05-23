@@ -3,8 +3,7 @@ kind: Ingress
 metadata:
   name: kafka-app-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:654625399485:certificate/980b9028-4b14-42a3-9e52-417a6842f8ad
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:654625399485:certificate/0ca8c8b9-0248-4ba4-b30e-edf775ab57f6
     alb.ingress.kubernetes.io/listen-ports: '[{ "HTTPS": 443 }]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/security-groups: sg-02b0c7a6010da9de1, sg-0885e7b643438b029, sg-0d46f5fb119123f5d, sg-0297d9183d6820297
@@ -16,62 +15,93 @@ metadata:
     kubernetes.io/ingress.class: alb
 spec:
   rules:
-  - host: labdev1002.com
+  - host: producer.labdev1002.com
     http:
       paths:
-      - path: /producer
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: producer
             port:
               number: 8888
-      - path: /primary-consumer-go
+  - host: primary-consumer.labdev1002.com
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: primary-consumer-go
             port:
               number: 8000
-      - path: /blue-consumer-go
+  - host: blue-consumer.labdev1002.com
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: blue-consumer-go
             port:
               number: 8001
-      - path: /orange-consumer-go
+  - host: orange-consumer.labdev1002.com
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: orange-consumer-go
             port:
               number: 8002
-      - path: /error-consumer-go
+  - host: error-consumer.labdev1002.com
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: error-consumer-go
             port:
               number: 8084
-      - path: /authorizer-go
+  - host: authorizer.labdev1002.com
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: authorizer-go
             port:
               number: 8082
-      - path: /notifier-go
+  - host: notifier.labdev1002.com
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: notifier-go
             port:
               number: 8083
-      - path: /provisioner-go
+  - host: provisioner.labdev1002.com
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: provisioner-go
             port:
               number: 8081 
+  - host: app.labdev1002.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wil-ui
+            port:
+              number: 80

@@ -7,7 +7,7 @@ metadata:
   labels:
     app: producer
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: producer
@@ -427,4 +427,41 @@ spec:
   ports:
   - port: 8083
     targetPort: 8083
+  type: NodePort
+---
+# Wil CP Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wil-ui
+  labels:
+    app: wil-ui
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wil-ui
+  template:
+    metadata:
+      labels:
+        app: wil-ui
+    spec:
+      containers:
+      - name: wil-ui
+        image: ghcr.io/gracebrickley/clus24-devwks-2047/wil-ui:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+# Wil CP Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: wil-ui
+spec:
+  selector:
+    app: wil-ui
+  ports:
+  - port: 80
+    targetPort: 80
   type: NodePort 

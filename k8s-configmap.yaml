@@ -17,7 +17,7 @@ data:
 
   # Provisioner Configuration
   PROVISIONER_CONSUMER_TOPICS: "new-user,notified"
-  PROVISIONER_CONSUMER_GROUP: "notifier-group"
+  PROVISIONER_CONSUMER_GROUP: "provisioner-group"
   PROVISIONER_PRODUCER_TOPIC: "authorize"
 
   # Authorizer Configuration

@@ -79,7 +79,7 @@ func main() {
 func corsMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         // Set CORS headers
-        w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // Allow requests from React app
+        w.Header().Set("Access-Control-Allow-Origin", "https://app.labdev1002.com") // Allow requests from React app
         w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")   // Allow specific HTTP methods
         w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization") // Allow specific headers
 

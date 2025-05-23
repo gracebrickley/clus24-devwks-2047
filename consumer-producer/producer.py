@@ -6,7 +6,7 @@ from flask_cors import CORS, cross_origin
 from kafka import KafkaProducer
 
 app = Flask(__name__)
-cors = CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "https://app.labdev1002.com"]}})
 
 producer = KafkaProducer(
     bootstrap_servers=os.environ.get('KAFKA_BOOTSTRAP_SERVERS').split(","),

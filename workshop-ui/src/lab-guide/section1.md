@@ -68,7 +68,7 @@ curl -O https://raw.githubusercontent.com/gracebrickley/clus24-devwks-2047/main/
 docker compose up
 ```
 
-Let's now checkout what’s happening by jumping into the [Kafka UI](http://localhost:8080).  The first page that pops up is the Dashboard with a single cluster listed called “local”.  We can also see this cluster listed in the navigation menu to the left.
+Let's now checkout what’s happening by jumping into the [Kafka UI](https://kafka-ui.labdev1002.com/).  The first page that pops up is the Dashboard with a single cluster listed called “kafka”.  We can also see this cluster listed in the navigation menu to the left.
 
 <a href="images/s1.1.png" class="glightbox">
     <img src="images/s1.1.png" alt="Kafka UI Dashboard"/>

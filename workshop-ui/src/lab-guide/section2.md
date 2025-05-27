@@ -16,7 +16,7 @@ In this section, we're working with the topic called `first-topic`, which will b
 
 You should be able to see the unique identifier prefixed to `first-topic` in the consumer box to the left.  Go ahead and copy that value and paste it into the search bar in the Topics tab of the Kafka UI to filter only your topics.
 
-Let’s try and send some messages now! Click on the “Send Event” button a few times to send messages to the Kafka cluster. To verify everything is working as expected, open the <a href="http://localhost:8080/ui/clusters/local/all-topics/first-topic/messages?keySerde=String&valueSerde=String&limit=100" target="_blank">Kafka UI</a> tab to see that `first-topic` was created (prefixed with your identifier), and the message count on the topic should increase each time you click the button.
+Let’s try and send some messages now! Click on the “Send Event” button a few times to send messages to the Kafka cluster. To verify everything is working as expected, open the <a href="https://kafka-ui.labdev1002.com/ui/clusters/kafka/all-topics/" target="_blank">Kafka UI</a> tab to see that `first-topic` was created (prefixed with your identifier), and the message count on the topic should increase each time you click the button.
 
 ## Running the Consumer
 

@@ -124,6 +124,7 @@ export default function Section4() {
                 }
                 //@ts-ignore
                 const val = responses[i]?.value
+                console.log("HERE are THE UI RESPONSES: ", responses)
                 if (val?.data?.length !== 0) {
                     console.log("HERE IS THE DATA when val?.data?.length !== 0: ", val.data)
                     let updatedTraces = [...traces]; // Safely capture the current state of traces

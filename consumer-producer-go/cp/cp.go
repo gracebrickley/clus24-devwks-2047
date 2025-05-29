@@ -168,8 +168,8 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 		Topic:    req.Topic,
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
-        CommitInterval: time.Second, // Periodic commit interval
-        RetentionTime:  time.Hour,   // Message retention time
+        // CommitInterval: time.Second, // Periodic commit interval
+        // RetentionTime:  time.Hour,   // Message retention time
         MaxWait:  500 * time.Millisecond,
 	})
 	consumers[req.Topic] = consumer
@@ -186,7 +186,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
                     time.Sleep(5 * time.Second) // Wait for leadership election
                     continue
                 }
-                break // Exit loop for non-recoverable errors
+                // break // Exit loop for non-recoverable errors
 			}
 
 			messageMapMu.Lock()

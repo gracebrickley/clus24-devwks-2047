@@ -21,6 +21,7 @@ producer = KafkaProducer(
 @app.post('/')
 @cross_origin()
 def receive_event():  # put application's code here
+    print("Received request to produce message")
     request_data = request.get_json()
     print("here is the request: ", request)
     print("here is the request data: ", request_data)
@@ -30,7 +31,8 @@ def receive_event():  # put application's code here
     if "topic" in request_data:
         topic = prefix + request_data["topic"]
     producer.send(topic, request_data)
-    producer.flush(timeout=30)
+    producer.flush(timeout=5)
+    print(f"Produced message to topic {topic} at {request_data['produced']}")
     return request_data
 
 
@@ -48,6 +50,6 @@ def get_pretty_time_with_milliseconds():
 
 
 if __name__ == '__main__':
-    app.run(port=os.environ.get("PORT", 8888), host=os.environ.get("HOST", "127.0.0.1"))
+    app.run(port=os.environ.get("PORT", 8888), host=os.environ.get("HOST", "0.0.0.0"))
 
 

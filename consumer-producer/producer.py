@@ -22,6 +22,8 @@ producer = KafkaProducer(
 @cross_origin()
 def receive_event():  # put application's code here
     request_data = request.get_json()
+    print("here is the request: ", request)
+    print("here is the request data: ", request_data)
     request_data["produced"] = get_pretty_time_with_milliseconds()
     prefix = request_data["prefix"]
     topic = prefix + "first-topic"

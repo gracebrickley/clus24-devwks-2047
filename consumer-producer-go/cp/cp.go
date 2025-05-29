@@ -193,6 +193,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 			MessageMap[req.Topic] = append(MessageMap[req.Topic], string(m.Value))
 			messageMapMu.Unlock()
 
+            log.Printf("Here is the message we received: %+v", m)
 			log.Printf("Message received from topic %s: %s", req.Topic, string(m.Value))
 
             if strings.Contains(req.Topic, "new-user") {

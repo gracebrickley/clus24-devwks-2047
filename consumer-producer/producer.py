@@ -31,7 +31,7 @@ def receive_event():  # put application's code here
         topic = prefix + request_data["topic"]
     producer.send(topic, request_data)
     producer.flush(timeout=5)
-    return ""
+    return request_data
 
 
 @app.route('/ping')

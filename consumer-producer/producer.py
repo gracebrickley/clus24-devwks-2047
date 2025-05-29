@@ -4,9 +4,13 @@ from datetime import datetime
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from kafka import KafkaProducer
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "https://app.labdev1002.com"]}})
+cors = CORS(app, resources={r"/*": {"origins": ["https://app.labdev1002.com"]}})
 
 producer = KafkaProducer(
     bootstrap_servers=os.environ.get('KAFKA_BOOTSTRAP_SERVERS').split(","),
@@ -21,10 +25,10 @@ producer = KafkaProducer(
 @app.post('/')
 @cross_origin()
 def receive_event():  # put application's code here
-    print("Received request to produce message")
+    logger.info("Received request to produce message")
     request_data = request.get_json()
-    print("here is the request: ", request)
-    print("here is the request data: ", request_data)
+    logger.info("here is the request: %s", request)
+    logger.info("here is the request data: %s", request_data)
     request_data["produced"] = get_pretty_time_with_milliseconds()
     prefix = request_data["prefix"]
     topic = prefix + "first-topic"
@@ -32,7 +36,7 @@ def receive_event():  # put application's code here
         topic = prefix + request_data["topic"]
     producer.send(topic, request_data)
     producer.flush(timeout=5)
-    print(f"Produced message to topic {topic} at {request_data['produced']}")
+    logger.info("Produced message to topic %s at %s", topic, request_data['produced'])
     return request_data
 
 

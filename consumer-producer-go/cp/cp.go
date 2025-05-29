@@ -170,6 +170,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 		MaxBytes: 10e6, // 10MB
         CommitInterval: time.Second, // Periodic commit interval
         RetentionTime:  time.Hour,   // Message retention time
+        MaxWait:  500 * time.Millisecond,
 	})
 	consumers[req.Topic] = consumer
 	consumersMu.Unlock()

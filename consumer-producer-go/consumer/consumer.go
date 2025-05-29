@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -162,6 +163,7 @@ func StartListener(w http.ResponseWriter, r *http.Request) {
             MinBytes: 10e3, // 10KB
             MaxBytes: 10e6, // 10MB
             StartOffset: startOffset,
+            MaxWait:  500 * time.Millisecond,
         })
         if r == nil {
             log.Printf("Failed to create Kafka reader for topic: %s\n", topic)

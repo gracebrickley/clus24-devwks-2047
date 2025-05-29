@@ -30,7 +30,7 @@ def receive_event():  # put application's code here
     if "topic" in request_data:
         topic = prefix + request_data["topic"]
     producer.send(topic, request_data)
-    producer.flush(timeout=5)
+    producer.flush(timeout=30)
     return request_data
 
 

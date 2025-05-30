@@ -160,7 +160,7 @@ func StartListener(w http.ResponseWriter, r *http.Request) {
             Brokers:  brokers,
             GroupID:  groupID,
             Topic:    topic,
-            MinBytes: 10e3, // 10KB
+            //MinBytes: 10e3, // 10KB
             MaxBytes: 10e6, // 10MB
             StartOffset: startOffset,
             MaxWait:  500 * time.Millisecond,

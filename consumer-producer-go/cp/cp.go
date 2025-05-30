@@ -166,7 +166,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 		Brokers:  brokers,
 		GroupID:  groupID,
 		Topic:    req.Topic,
-		MinBytes: 10e3, // 10KB
+		// MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
         // CommitInterval: time.Second, // Periodic commit interval
         // RetentionTime:  time.Hour,   // Message retention time

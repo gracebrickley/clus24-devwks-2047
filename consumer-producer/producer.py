@@ -35,7 +35,7 @@ def receive_event():  # put application's code here
     if "topic" in request_data:
         topic = prefix + request_data["topic"]
     logger.info(f"Sending request data to topic: {topic} | request_data: {request_data}")
-    producer.send(topic, json.dumps(request_data).encode('utf-8'))
+    producer.send(topic, request_data)
     producer.flush(timeout=5)
     logger.info("Produced message to topic %s at %s", topic, request_data['produced'])
     return request_data

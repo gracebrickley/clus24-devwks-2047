@@ -288,6 +288,11 @@ spec:
         ports:
         - containerPort: 8081
         env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
         - name: PORT
           value: "8081"
         - name: CONSUMER_TOPICS
@@ -343,6 +348,11 @@ spec:
         ports:
         - containerPort: 8082
         env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
         - name: CONSUMER_TOPICS
           valueFrom:
             configMapKeyRef:
@@ -398,6 +408,11 @@ spec:
         ports:
         - containerPort: 8083
         env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: kafka-app-config
+              key: BOOTSTRAP_SERVERS
         - name: CONSUMER_TOPICS
           valueFrom:
             configMapKeyRef:

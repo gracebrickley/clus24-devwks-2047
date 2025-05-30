@@ -164,26 +164,31 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("creating a new consumer for topic: %s\n", req.Topic)
 	consumer := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: brokers,
-		GroupID: groupID,
-		Topic:   req.Topic,
-		// MinBytes: 10e3, // 10KB
-		MaxBytes:    10e6, // 10MB
-		MaxWait:     500 * time.Millisecond,
-		StartOffset: kafka.FirstOffset,
+		Brokers:  brokers,
+		GroupID:  groupID,
+		Topic:    req.Topic,
+		MinBytes: 1,                      // respond as soon as possible
+		MaxBytes: 10e6,                   // 10MB max
+		MaxWait:  500 * time.Millisecond, // reasonable latency tradeoff
+		//StartOffset: kafka.LastOffset,
 	})
 	log.Printf("Kafka consumer created for topic: %s\n", req.Topic)
 	consumers[req.Topic] = consumer
 	log.Printf("Kafka consumer added to consumers map for topic: %s\n", req.Topic)
 	consumersMu.Unlock()
 	log.Printf("consumer mux unlocked")
+	ctx, _ := context.WithCancel(context.Background())
 
 	go func() {
 		log.Printf("enter the gofunc for topic: %s\n", req.Topic)
 		for {
 			log.Printf("Reading message from topic: %s\n", req.Topic)
-			m, err := consumer.ReadMessage(context.Background())
+			m, err := consumer.ReadMessage(ctx)
 			if err != nil {
+				if ctx.Err() != nil {
+					log.Printf("Context canceled, stopping consumer for topic: %s; reason: %s", req.Topic, ctx.Err().Error())
+					return
+				}
 				log.Printf("Error reading message from topic %s: %v", req.Topic, err)
 
 				// Retry logic for transient errors

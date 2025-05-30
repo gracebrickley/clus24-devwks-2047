@@ -27,7 +27,7 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: kafka-app-config
-              key: BOOTSTRAP_SERVERS
+              key: PRODUCER_BOOTSTRAP_SERVERS
         - name: PORT
           value: "8888"
         - name: HOST

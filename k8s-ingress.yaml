@@ -105,3 +105,13 @@ spec:
             name: wil-ui
             port:
               number: 80
+  - host: kafka-ui.labdev1002.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kafbat-ui-kafka-ui
+            port:
+              number: 8080

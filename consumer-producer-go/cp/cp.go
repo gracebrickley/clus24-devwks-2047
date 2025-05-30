@@ -18,17 +18,17 @@ var (
 	kafkaBootstrapServers = os.Getenv("KAFKA_BOOTSTRAP_SERVERS")
 	// consumerTopics        = os.Getenv("CONSUMER_TOPICS")
 	// producerTopic         = os.Getenv("PRODUCER_TOPIC")
-	groupID               = os.Getenv("CONSUMER_GROUP")
+	groupID = os.Getenv("CONSUMER_GROUP")
 )
 
 var (
 	MessageMap   = make(map[string][]string)
 	messageMapMu sync.Mutex
 	producers    = make(map[string]*kafka.Writer)
-    producersMu  sync.Mutex
+	producersMu  sync.Mutex
 	consumers    = make(map[string]*kafka.Reader)
 	consumersMu  sync.Mutex
-    isError      bool
+	isError      bool
 )
 
 func main() {
@@ -43,8 +43,8 @@ func main() {
 	// Endpoint to stop a consumer
 	mux.HandleFunc("/stop-consumer", StopConsumerHandler)
 
-    // Endpoint to ping the service
-    mux.HandleFunc("/ping", PingHandler)
+	// Endpoint to ping the service
+	mux.HandleFunc("/ping", PingHandler)
 
 	// Endpoint to fetch messages
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -64,11 +64,11 @@ func main() {
 		if currMessages == nil {
 			currMessages = make([]string, 0)
 		}
-        if topic == "new-user" {
-            otherCurrMessages := MessageMap[prefix+"notified"]
-            currMessages = append(currMessages, otherCurrMessages...)
-            MessageMap[prefix+"notified"] = make([]string, 0)
-        }
+		if topic == "new-user" {
+			otherCurrMessages := MessageMap[prefix+"notified"]
+			currMessages = append(currMessages, otherCurrMessages...)
+			MessageMap[prefix+"notified"] = make([]string, 0)
+		}
 		MessageMap[prefix+topic] = make([]string, 0)
 		messageMapMu.Unlock()
 
@@ -93,61 +93,61 @@ func main() {
 
 // StartProducerHandler starts a Kafka producer
 func StartProducerHandler(w http.ResponseWriter, r *http.Request) {
-    var req struct {
-        Topic string `json:"topic"`
-    }
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        log.Printf("Error decoding request body: %v\n", err)
-        http.Error(w, "Invalid request payload", http.StatusBadRequest)
-        return
-    }
+	var req struct {
+		Topic string `json:"topic"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding request body: %v\n", err)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
 
-    log.Printf("Request to start producer for topic: %s\n", req.Topic)
+	log.Printf("Request to start producer for topic: %s\n", req.Topic)
 
-    // Check if a producer already exists for the requested topic
-    if _, exists := producers[req.Topic]; exists {
-        http.Error(w, "Producer for this topic is already started", http.StatusConflict)
-        return
-    }
+	// Check if a producer already exists for the requested topic
+	if _, exists := producers[req.Topic]; exists {
+		http.Error(w, "Producer for this topic is already started", http.StatusConflict)
+		return
+	}
 
-    brokers := strings.Split(kafkaBootstrapServers, ",")
-    if len(brokers) == 0 {
-        http.Error(w, "No Kafka bootstrap servers provided", http.StatusInternalServerError)
-        return
-    }
+	brokers := strings.Split(kafkaBootstrapServers, ",")
+	if len(brokers) == 0 {
+		http.Error(w, "No Kafka bootstrap servers provided", http.StatusInternalServerError)
+		return
+	}
 
-    // Create a new producer for the specified topic
-    producer := kafka.NewWriter(kafka.WriterConfig{
-        Brokers:  brokers,
-        Topic:    req.Topic,
-        Balancer: &kafka.LeastBytes{},
-    })
+	// Create a new producer for the specified topic
+	producer := kafka.NewWriter(kafka.WriterConfig{
+		Brokers:  brokers,
+		Topic:    req.Topic,
+		Balancer: &kafka.LeastBytes{},
+	})
 
-    // Store the producer in the map
-    producers[req.Topic] = producer
+	// Store the producer in the map
+	producers[req.Topic] = producer
 
-    log.Println("Kafka producer started for topic:", req.Topic)
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("Producer started for topic: " + req.Topic))
+	log.Println("Kafka producer started for topic:", req.Topic)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Producer started for topic: " + req.Topic))
 }
 
 // StartConsumerHandler starts a Kafka consumer for a given topic
 func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
-    isError = false
+	isError = false
 	var req struct {
-        Topic string `json:"topic"`
-        Error bool `json:"error"`
-    }
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        log.Printf("Error decoding request body: %v\n", err)
-        http.Error(w, "Invalid request payload", http.StatusBadRequest)
-        return
-    }
+		Topic string `json:"topic"`
+		Error bool   `json:"error"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding request body: %v\n", err)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
 
-    isError = req.Error
-    log.Printf("Error flag set to: %v\n", isError)
+	isError = req.Error
+	log.Printf("Error flag set to: %v\n", isError)
 
-    log.Printf("Request to start listener for topic: %s\n", req.Topic)
+	log.Printf("Request to start listener for topic: %s\n", req.Topic)
 
 	brokers := strings.Split(kafkaBootstrapServers, ",")
 	if len(brokers) == 0 {
@@ -163,14 +163,13 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	consumer := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  brokers,
-		GroupID:  groupID,
-		Topic:    req.Topic,
+		Brokers: brokers,
+		GroupID: groupID,
+		Topic:   req.Topic,
 		// MinBytes: 10e3, // 10KB
-		MaxBytes: 10e6, // 10MB
-        // CommitInterval: time.Second, // Periodic commit interval
-        // RetentionTime:  time.Hour,   // Message retention time
-        MaxWait:  500 * time.Millisecond,
+		MaxBytes:    10e6, // 10MB
+		MaxWait:     500 * time.Millisecond,
+		StartOffset: kafka.FirstOffset,
 	})
 	consumers[req.Topic] = consumer
 	consumersMu.Unlock()
@@ -181,164 +180,164 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Printf("Error reading message from topic %s: %v", req.Topic, err)
 
-                // Retry logic for transient errors
-                if strings.Contains(err.Error(), "Leader Not Available") {
-                    time.Sleep(5 * time.Second) // Wait for leadership election
-                    continue
-                }
-                // break // Exit loop for non-recoverable errors
+				// Retry logic for transient errors
+				if strings.Contains(err.Error(), "Leader Not Available") {
+					time.Sleep(5 * time.Second) // Wait for leadership election
+					continue
+				}
+				// break // Exit loop for non-recoverable errors
 			}
 
 			messageMapMu.Lock()
 			MessageMap[req.Topic] = append(MessageMap[req.Topic], string(m.Value))
 			messageMapMu.Unlock()
 
-            log.Printf("Here is the message we received: %+v", m)
+			log.Printf("Here is the message we received: %+v", m)
 			log.Printf("Message received from topic %s: %s", req.Topic, string(m.Value))
 
-            if strings.Contains(req.Topic, "new-user") {
-                prefix := strings.Split(req.Topic, "new")[0]
-                var messageData map[string]interface{}
-                    if err := json.Unmarshal(m.Value, &messageData); err != nil {
-                        log.Printf("Failed to unmarshal message value: %v", err)
-                        continue
-                    }
-                department := messageData["dept"]
-                if isError && department == "Finance" {
-                    errorProducer := producers[prefix+"dlq"]
-                    var messageData map[string]interface{}
-                    if err := json.Unmarshal(m.Value, &messageData); err != nil {
-                        log.Printf("Failed to unmarshal message value: %v", err)
-                        continue
-                    }
-                    userId := capitalizeFirstLetter(messageData["id"].(string))
-                    err := errorProducer.WriteMessages(context.Background(),
-                        kafka.Message{
-                            Key:   []byte(prefix+"dlq"),
-                            Value: []byte(fmt.Sprintf("Provisioner: user %s is invalid; could this be a security breach?", userId)),
-                        },
-                    )
-                    if err != nil {
-                        log.Printf("Failed to write error message to DLQ: %v", err)
-                    }
-                } else {
-                    producerTopic := prefix + "authorize"
-                    producerMessage := m.Value
-                    producerMessage = []byte(strings.Replace(string(producerMessage), "new-user", "authorize", 1))
-                    producersMu.Lock()
-                    producer, exists := producers[producerTopic]
-                    if !exists {
-                        log.Printf("No producer found for topic: %s", req.Topic)
-                        producersMu.Unlock()
-                        continue
-                    }
-                    err = producer.WriteMessages(context.Background(),
-                        kafka.Message{
-                            Key:   []byte(producerTopic),
-                            Value: producerMessage,
-                        },
-                    )
-                    if err != nil { 
-                        log.Printf("Failed to write message to %s topic: %v", producerTopic, err)
-                    } else {
-                        log.Printf("Message sent to %s topic: %s", producerTopic, string(producerMessage))
-                    }
-                    producersMu.Unlock()
-                }
-            }
-            if strings.Contains(req.Topic, "authorize") {
-                prefix := strings.Split(req.Topic, "authorize")[0]
-                if isError && shouldRaiseError() {
-                    errorProducer := producers[prefix+"dlq"]
-                    var messageData map[string]interface{}
-                    if err := json.Unmarshal(m.Value, &messageData); err != nil {
-                        log.Printf("Failed to unmarshal message value: %v", err)
-                        continue
-                    }
-                    deviceId, ok := messageData["device"].(string)
-                    userId := capitalizeFirstLetter(messageData["id"].(string))
-                    if !ok {
-                        log.Printf("device not found or not a string in message: %v", messageData)
-                        continue
-                    }
-                    err := errorProducer.WriteMessages(context.Background(),
-                        kafka.Message{
-                            Key:   []byte(prefix+"dlq"),
-                            Value: []byte(fmt.Sprintf("Authorizer: device type %s for user %s requires security updates, cannot authorize", deviceId, userId)),
-                        },
-                    )
-                    if err != nil {
-                        log.Printf("Failed to write error message to DLQ: %v", err)
-                    }
-                } else {
-                    producerTopic := prefix + "notify"
-                    producerMessage := m.Value
-                    producerMessage = []byte(strings.Replace(string(producerMessage), "authorize", "notify", 1))
-                    producersMu.Lock()
-                    producer, exists := producers[producerTopic]
-                    if !exists {
-                        log.Printf("No producer found for topic: %s", req.Topic)
-                        producersMu.Unlock()
-                        continue
-                    }
-                    err = producer.WriteMessages(context.Background(),
-                        kafka.Message{
-                            Key:   []byte(producerTopic),
-                            Value: producerMessage,
-                        },
-                    )
-                    if err != nil { 
-                        log.Printf("Failed to write message to %s topic: %v", producerTopic, err)
-                    } else {
-                        log.Printf("Message sent to %s topic: %s", producerTopic, string(producerMessage))
-                    }
-                    producersMu.Unlock()
-                }
-            }
-            if strings.Contains(req.Topic, "notify") {
-                prefix := strings.Split(req.Topic, "notify")[0]
-                if isError && shouldRaiseError() {
-                    errorProducer := producers[prefix+"dlq"]
-                    var messageData map[string]interface{}
-                    if err := json.Unmarshal(m.Value, &messageData); err != nil {
-                        log.Printf("Failed to unmarshal message value: %v", err)
-                        continue
-                    }
-                    userId  := capitalizeFirstLetter(messageData["id"].(string))
-                    err := errorProducer.WriteMessages(context.Background(),
-                        kafka.Message{
-                            Key:   []byte(prefix+"dlq"),
-                            Value: []byte(fmt.Sprintf("Notifier: could not find LDAP account for user %s", userId)),
-                        },
-                    )
-                    if err != nil {
-                        log.Printf("Failed to write error message to DLQ: %v", err)
-                    }
-                } else {
-                    producerTopic := prefix + "notified"
-                    producerMessage := m.Value
-                    producerMessage = []byte(strings.Replace(string(producerMessage), "notify", "notified", 1))
-                    producersMu.Lock()
-                    producer, exists := producers[producerTopic]
-                    if !exists {
-                        log.Printf("No producer found for topic: %s", req.Topic)
-                        producersMu.Unlock()
-                        continue
-                    }
-                    err = producer.WriteMessages(context.Background(),
-                        kafka.Message{
-                            Key:   []byte(producerTopic),
-                            Value: producerMessage,
-                        },
-                    )
-                    if err != nil { 
-                        log.Printf("Failed to write message to %s topic: %v", producerTopic, err)
-                    } else {
-                        log.Printf("Message sent to %s topic: %s", producerTopic, string(producerMessage))
-                    }
-                    producersMu.Unlock()
-                }
-            }
+			if strings.Contains(req.Topic, "new-user") {
+				prefix := strings.Split(req.Topic, "new")[0]
+				var messageData map[string]interface{}
+				if err := json.Unmarshal(m.Value, &messageData); err != nil {
+					log.Printf("Failed to unmarshal message value: %v", err)
+					continue
+				}
+				department := messageData["dept"]
+				if isError && department == "Finance" {
+					errorProducer := producers[prefix+"dlq"]
+					var messageData map[string]interface{}
+					if err := json.Unmarshal(m.Value, &messageData); err != nil {
+						log.Printf("Failed to unmarshal message value: %v", err)
+						continue
+					}
+					userId := capitalizeFirstLetter(messageData["id"].(string))
+					err := errorProducer.WriteMessages(context.Background(),
+						kafka.Message{
+							Key:   []byte(prefix + "dlq"),
+							Value: []byte(fmt.Sprintf("Provisioner: user %s is invalid; could this be a security breach?", userId)),
+						},
+					)
+					if err != nil {
+						log.Printf("Failed to write error message to DLQ: %v", err)
+					}
+				} else {
+					producerTopic := prefix + "authorize"
+					producerMessage := m.Value
+					producerMessage = []byte(strings.Replace(string(producerMessage), "new-user", "authorize", 1))
+					producersMu.Lock()
+					producer, exists := producers[producerTopic]
+					if !exists {
+						log.Printf("No producer found for topic: %s", req.Topic)
+						producersMu.Unlock()
+						continue
+					}
+					err = producer.WriteMessages(context.Background(),
+						kafka.Message{
+							Key:   []byte(producerTopic),
+							Value: producerMessage,
+						},
+					)
+					if err != nil {
+						log.Printf("Failed to write message to %s topic: %v", producerTopic, err)
+					} else {
+						log.Printf("Message sent to %s topic: %s", producerTopic, string(producerMessage))
+					}
+					producersMu.Unlock()
+				}
+			}
+			if strings.Contains(req.Topic, "authorize") {
+				prefix := strings.Split(req.Topic, "authorize")[0]
+				if isError && shouldRaiseError() {
+					errorProducer := producers[prefix+"dlq"]
+					var messageData map[string]interface{}
+					if err := json.Unmarshal(m.Value, &messageData); err != nil {
+						log.Printf("Failed to unmarshal message value: %v", err)
+						continue
+					}
+					deviceId, ok := messageData["device"].(string)
+					userId := capitalizeFirstLetter(messageData["id"].(string))
+					if !ok {
+						log.Printf("device not found or not a string in message: %v", messageData)
+						continue
+					}
+					err := errorProducer.WriteMessages(context.Background(),
+						kafka.Message{
+							Key:   []byte(prefix + "dlq"),
+							Value: []byte(fmt.Sprintf("Authorizer: device type %s for user %s requires security updates, cannot authorize", deviceId, userId)),
+						},
+					)
+					if err != nil {
+						log.Printf("Failed to write error message to DLQ: %v", err)
+					}
+				} else {
+					producerTopic := prefix + "notify"
+					producerMessage := m.Value
+					producerMessage = []byte(strings.Replace(string(producerMessage), "authorize", "notify", 1))
+					producersMu.Lock()
+					producer, exists := producers[producerTopic]
+					if !exists {
+						log.Printf("No producer found for topic: %s", req.Topic)
+						producersMu.Unlock()
+						continue
+					}
+					err = producer.WriteMessages(context.Background(),
+						kafka.Message{
+							Key:   []byte(producerTopic),
+							Value: producerMessage,
+						},
+					)
+					if err != nil {
+						log.Printf("Failed to write message to %s topic: %v", producerTopic, err)
+					} else {
+						log.Printf("Message sent to %s topic: %s", producerTopic, string(producerMessage))
+					}
+					producersMu.Unlock()
+				}
+			}
+			if strings.Contains(req.Topic, "notify") {
+				prefix := strings.Split(req.Topic, "notify")[0]
+				if isError && shouldRaiseError() {
+					errorProducer := producers[prefix+"dlq"]
+					var messageData map[string]interface{}
+					if err := json.Unmarshal(m.Value, &messageData); err != nil {
+						log.Printf("Failed to unmarshal message value: %v", err)
+						continue
+					}
+					userId := capitalizeFirstLetter(messageData["id"].(string))
+					err := errorProducer.WriteMessages(context.Background(),
+						kafka.Message{
+							Key:   []byte(prefix + "dlq"),
+							Value: []byte(fmt.Sprintf("Notifier: could not find LDAP account for user %s", userId)),
+						},
+					)
+					if err != nil {
+						log.Printf("Failed to write error message to DLQ: %v", err)
+					}
+				} else {
+					producerTopic := prefix + "notified"
+					producerMessage := m.Value
+					producerMessage = []byte(strings.Replace(string(producerMessage), "notify", "notified", 1))
+					producersMu.Lock()
+					producer, exists := producers[producerTopic]
+					if !exists {
+						log.Printf("No producer found for topic: %s", req.Topic)
+						producersMu.Unlock()
+						continue
+					}
+					err = producer.WriteMessages(context.Background(),
+						kafka.Message{
+							Key:   []byte(producerTopic),
+							Value: producerMessage,
+						},
+					)
+					if err != nil {
+						log.Printf("Failed to write message to %s topic: %v", producerTopic, err)
+					} else {
+						log.Printf("Message sent to %s topic: %s", producerTopic, string(producerMessage))
+					}
+					producersMu.Unlock()
+				}
+			}
 		}
 	}()
 
@@ -350,15 +349,15 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 // StopConsumerHandler stops a Kafka consumer for a given topic
 func StopConsumerHandler(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-        Topic string `json:"topic"`
-    }
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        log.Printf("Error decoding request body: %v\n", err)
-        http.Error(w, "Invalid request payload", http.StatusBadRequest)
-        return
-    }
+		Topic string `json:"topic"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("Error decoding request body: %v\n", err)
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
 
-    log.Printf("Request to start listener for topic: %s\n", req.Topic)
+	log.Printf("Request to start listener for topic: %s\n", req.Topic)
 
 	consumersMu.Lock()
 	consumer, exists := consumers[req.Topic]
@@ -393,22 +392,22 @@ func corsMiddleware(next http.Handler) http.Handler {
 }
 
 func PingHandler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "pong:%s", os.Getenv("CONSUMER_GROUP"))
+	fmt.Fprintf(w, "pong:%s", os.Getenv("CONSUMER_GROUP"))
 }
 
 func shouldRaiseError() bool {
-    // Simulate a 10% chance of an error occurring
-    return randomFloat() < 0.1
+	// Simulate a 10% chance of an error occurring
+	return randomFloat() < 0.1
 }
 
 // capitalizeFirstLetter capitalizes the first letter of a string
 func capitalizeFirstLetter(s string) string {
-    if len(s) == 0 {
-        return s
-    }
-    return strings.ToUpper(string(s[0])) + s[1:]
+	if len(s) == 0 {
+		return s
+	}
+	return strings.ToUpper(string(s[0])) + s[1:]
 }
 
 func randomFloat() float64 {
-    return float64(time.Now().UnixNano()%1000) / 1000.0
+	return float64(time.Now().UnixNano()%1000) / 1000.0
 }

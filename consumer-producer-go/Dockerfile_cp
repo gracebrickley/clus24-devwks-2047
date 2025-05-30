@@ -7,11 +7,4 @@ RUN go mod download
 
 COPY cp/ .
 
-ENV KAFKA_BOOTSTRAP_SERVERS='kafka1:9092,kafka2:9092'
-ENV CONSUMER_TOPICS='new-user,notified'
-ENV CONSUMER_GROUP='provisioning-group'
-ENV PRODUCER_TOPIC='authorize'
-ENV ERROR_TOPIC='dlq'
-ENV PORT=8081
-
 CMD ["go", "run", "cp.go"]

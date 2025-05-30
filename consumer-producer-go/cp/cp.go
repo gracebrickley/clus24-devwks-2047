@@ -384,7 +384,7 @@ func StopConsumerHandler(w http.ResponseWriter, r *http.Request) {
 	delete(consumers, req.Topic)
 	consumersMu.Unlock()
 
-	consumer.Close()
+	consumer.Reader.Close()
 	log.Printf("Kafka consumer stopped for topic: %s", req.Topic)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf("Consumer stopped for topic: %s", req.Topic)))

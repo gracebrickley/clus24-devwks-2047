@@ -21,12 +21,17 @@ var (
 	groupID = os.Getenv("CONSUMER_GROUP")
 )
 
+type ConsumerEntry struct {
+	Reader *kafka.Reader
+	Cancel context.CancelFunc
+}
+
 var (
 	MessageMap   = make(map[string][]string)
 	messageMapMu sync.Mutex
 	producers    = make(map[string]*kafka.Writer)
 	producersMu  sync.Mutex
-	consumers    = make(map[string]*kafka.Reader)
+	consumers    = make(map[string]*ConsumerEntry)
 	consumersMu  sync.Mutex
 	isError      bool
 )
@@ -163,49 +168,43 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("creating a new consumer for topic: %s\n", req.Topic)
-	consumer := kafka.NewReader(kafka.ReaderConfig{
+	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  brokers,
 		GroupID:  groupID,
 		Topic:    req.Topic,
-		MinBytes: 1,                      // respond as soon as possible
-		MaxBytes: 10e6,                   // 10MB max
-		MaxWait:  500 * time.Millisecond, // reasonable latency tradeoff
-		//StartOffset: kafka.LastOffset,
+		MinBytes: 1,
+		MaxBytes: 10e6,
+		MaxWait:  500 * time.Millisecond,
 	})
-	log.Printf("Kafka consumer created for topic: %s\n", req.Topic)
-	consumers[req.Topic] = consumer
-	log.Printf("Kafka consumer added to consumers map for topic: %s\n", req.Topic)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	consumers[req.Topic] = &ConsumerEntry{
+		Reader: reader,
+		Cancel: cancel,
+	}
 	consumersMu.Unlock()
-	log.Printf("consumer mux unlocked")
-	ctx, _ := context.WithCancel(context.Background())
 
 	go func() {
-		log.Printf("enter the gofunc for topic: %s\n", req.Topic)
+		defer log.Printf("Consumer goroutine exiting for topic: %s", req.Topic)
+
 		for {
-			log.Printf("Reading message from topic: %s\n", req.Topic)
-			m, err := consumer.ReadMessage(ctx)
+			log.Printf("Consumer goroutine waiting for message on topic %s...", req.Topic)
+			m, err := reader.ReadMessage(ctx)
 			if err != nil {
 				if ctx.Err() != nil {
 					log.Printf("Context canceled, stopping consumer for topic: %s; reason: %s", req.Topic, ctx.Err().Error())
 					return
 				}
-				log.Printf("Error reading message from topic %s: %v", req.Topic, err)
 
-				// Retry logic for transient errors
-				if strings.Contains(err.Error(), "Leader Not Available") {
-					log.Printf("Leader Not Available error for topic %s, retrying...", req.Topic)
-					time.Sleep(5 * time.Second) // Wait for leadership election
-					continue
-				}
-				// break // Exit loop for non-recoverable errors
+				log.Printf("Kafka read error on topic %s: %v", req.Topic, err)
+				time.Sleep(1 * time.Second)
+				continue
 			}
 
 			log.Printf("Message received from topic %s: %s", req.Topic, string(m.Value))
-			log.Printf("locking message map")
+
 			messageMapMu.Lock()
-			log.Printf("appending message to MessageMap for topic: %s", req.Topic)
 			MessageMap[req.Topic] = append(MessageMap[req.Topic], string(m.Value))
-			log.Printf("unlocking message map")
 			messageMapMu.Unlock()
 
 			log.Printf("Here is the message we received: %+v", m)

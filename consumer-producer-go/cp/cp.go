@@ -155,13 +155,14 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("locking consumer mux for topic: %s\n", req.Topic)
 	consumersMu.Lock()
 	if _, exists := consumers[req.Topic]; exists {
 		consumersMu.Unlock()
 		http.Error(w, "Consumer already exists for this topic", http.StatusConflict)
 		return
 	}
-
+	log.Printf("creating a new consumer for topic: %s\n", req.Topic)
 	consumer := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: brokers,
 		GroupID: groupID,
@@ -171,25 +172,35 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 		MaxWait:     500 * time.Millisecond,
 		StartOffset: kafka.FirstOffset,
 	})
+	log.Printf("Kafka consumer created for topic: %s\n", req.Topic)
 	consumers[req.Topic] = consumer
+	log.Printf("Kafka consumer added to consumers map for topic: %s\n", req.Topic)
 	consumersMu.Unlock()
+	log.Printf("consumer mux unlocked")
 
 	go func() {
+		log.Printf("enter the gofunc for topic: %s\n", req.Topic)
 		for {
+			log.Printf("Reading message from topic: %s\n", req.Topic)
 			m, err := consumer.ReadMessage(context.Background())
 			if err != nil {
 				log.Printf("Error reading message from topic %s: %v", req.Topic, err)
 
 				// Retry logic for transient errors
 				if strings.Contains(err.Error(), "Leader Not Available") {
+					log.Printf("Leader Not Available error for topic %s, retrying...", req.Topic)
 					time.Sleep(5 * time.Second) // Wait for leadership election
 					continue
 				}
 				// break // Exit loop for non-recoverable errors
 			}
 
+			log.Printf("Message received from topic %s: %s", req.Topic, string(m.Value))
+			log.Printf("locking message map")
 			messageMapMu.Lock()
+			log.Printf("appending message to MessageMap for topic: %s", req.Topic)
 			MessageMap[req.Topic] = append(MessageMap[req.Topic], string(m.Value))
+			log.Printf("unlocking message map")
 			messageMapMu.Unlock()
 
 			log.Printf("Here is the message we received: %+v", m)

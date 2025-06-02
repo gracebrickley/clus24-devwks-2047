@@ -176,14 +176,18 @@ export default function SectionLayout(props: {
                   startIcon={<ChevronLeft />}
                   size={"large"}
                   sx={{ float: "left" }}
-                  onClick={() => {
-                    stopListenerLogic().then(() => {
-                      navigate(
-                        sectionNumber === 2
-                          ? "/"
-                          : `/section-${sectionNumber - 1}`
-                      );
-                    });
+                  onClick={async () => {
+                    const newPath =
+                      sectionNumber === 2
+                        ? "/"
+                        : `/section-${sectionNumber - 1}`;
+                    try {
+                      await stopListenerLogic(); // Ensure this resolves successfully
+                      navigate(newPath); // Navigate to the new path
+                    } catch (error) {
+                      console.error("Failed to stop listener logic:", error);
+                      navigate(newPath); // Navigate even if stopping the listener fails
+                    }
                   }}
                 >
                   Section {sectionNumber - 1}
@@ -197,10 +201,15 @@ export default function SectionLayout(props: {
                   endIcon={<ChevronRight />}
                   size={"large"}
                   sx={{ float: "right" }}
-                  onClick={() => {
-                    stopListenerLogic().then(() => {
-                      navigate(`/section-${sectionNumber + 1}`);
-                    });
+                  onClick={async () => {
+                    const newPath = `/section-${sectionNumber + 1}`;
+                    try {
+                      await stopListenerLogic(); // Ensure this resolves successfully
+                      navigate(newPath); // Navigate to the new path
+                    } catch (error) {
+                      console.error("Failed to stop listener logic:", error);
+                      navigate(newPath); // Navigate even if stopping the listener fails
+                    }
                   }}
                 >
                   Section {sectionNumber + 1}

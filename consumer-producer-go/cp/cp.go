@@ -46,7 +46,7 @@ func main() {
 	mux.HandleFunc("/start-consumer", StartConsumerHandler)
 
 	// Endpoint to stop a consumer
-	mux.HandleFunc("/stop-consumer", StopConsumerHandler)
+	mux.HandleFunc("/stop-listener", StopConsumerHandler)
 
 	// Endpoint to ping the service
 	mux.HandleFunc("/ping", PingHandler)

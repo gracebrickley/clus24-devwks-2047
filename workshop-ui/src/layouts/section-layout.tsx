@@ -122,10 +122,10 @@ export default function SectionLayout(props: {
       await axios.post(`${PROVISIONER_URL}/stop-producer`, {
         topic: sessionStorage.getItem("UID") + "authorize",
       });
-      await axios.post(`${AUTHORIZER_URL}/start-producer`, {
+      await axios.post(`${AUTHORIZER_URL}/stop-producer`, {
         topic: sessionStorage.getItem("UID") + "notify",
       });
-      await axios.post(`${NOTIFIER_URL}/start-producer`, {
+      await axios.post(`${NOTIFIER_URL}/stop-producer`, {
         topic: sessionStorage.getItem("UID") + "notified",
       });
     }
@@ -139,10 +139,10 @@ export default function SectionLayout(props: {
       await axios.post(`${PROVISIONER_URL}/stop-producer`, {
         topic: sessionStorage.getItem("UID") + "authorize",
       });
-      await axios.post(`${AUTHORIZER_URL}/start-producer`, {
+      await axios.post(`${AUTHORIZER_URL}/stop-producer`, {
         topic: sessionStorage.getItem("UID") + "notify",
       });
-      await axios.post(`${NOTIFIER_URL}/start-producer`, {
+      await axios.post(`${NOTIFIER_URL}/stop-producer`, {
         topic: sessionStorage.getItem("UID") + "notified",
       });
     }

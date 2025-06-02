@@ -42,6 +42,9 @@ func main() {
 	// Endpoint to start a producer
 	mux.HandleFunc("/start-producer", StartProducerHandler)
 
+    // Endpoint to stop a producer
+	mux.HandleFunc("/stop-producer", StopProducerHandler)
+
 	// Endpoint to start a consumer
 	mux.HandleFunc("/start-consumer", StartConsumerHandler)
 
@@ -134,6 +137,39 @@ func StartProducerHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Kafka producer started for topic:", req.Topic)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Producer started for topic: " + req.Topic))
+}
+
+func StopProducerHandler(w http.ResponseWriter, r *http.Request) {
+    var req struct {
+        Topic string `json:"topic"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        log.Printf("Error decoding request body: %v\n", err)
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    log.Printf("Request to stop producer for topic: %s\n", req.Topic)
+
+    producersMu.Lock()
+    producer, exists := producers[req.Topic]
+    if !exists {
+        producersMu.Unlock()
+        http.Error(w, "No producer exists for this topic", http.StatusNotFound)
+        return
+    }
+    delete(producers, req.Topic)
+    producersMu.Unlock()
+
+    if err := producer.Close(); err != nil {
+        log.Printf("Error closing producer for topic %s: %v\n", req.Topic, err)
+        http.Error(w, "Failed to stop producer", http.StatusInternalServerError)
+        return
+    }
+
+    log.Printf("Kafka producer stopped for topic: %s", req.Topic)
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(fmt.Sprintf("Producer stopped for topic: %s", req.Topic)))
 }
 
 // StartConsumerHandler starts a Kafka consumer for a given topic

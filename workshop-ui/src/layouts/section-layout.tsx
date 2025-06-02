@@ -6,7 +6,7 @@ import Toolbar from "@mui/material/Toolbar";
 import { Remarkable } from "remarkable";
 import hljs from "highlight.js";
 import GLightbox from "glightbox";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Grid } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { ProducerService } from "../services/producer.srvc";
@@ -19,6 +19,7 @@ import {
   NOTIFIER_URL,
   DLQ_URL,
 } from "../config/constants";
+import axios from "axios";
 
 const md = new Remarkable("full", {
   html: true,
@@ -42,6 +43,7 @@ export default function SectionLayout(props: {
   const [markdown, setMarkdown] = useState("");
   const [sectionNumber, setSectionNumber] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const reader = document.getElementById("markdown-renderer");
@@ -99,7 +101,7 @@ export default function SectionLayout(props: {
     });
   }, [markdown]);
 
-  const stopListenerLogic = () => {
+  const stopListenerLogic = async () => {
     async function stopListener(topicPostfix: string, url: string) {
       const topic = sessionStorage.getItem("UID") + topicPostfix;
       await ProducerService.stopListener(topic, url);
@@ -117,6 +119,15 @@ export default function SectionLayout(props: {
       stopListener("notified", PROVISIONER_URL);
       stopListener("authorize", AUTHORIZER_URL);
       stopListener("notify", NOTIFIER_URL);
+      await axios.post(`${PROVISIONER_URL}/stop-producer`, {
+        topic: sessionStorage.getItem("UID") + "authorize",
+      });
+      await axios.post(`${AUTHORIZER_URL}/start-producer`, {
+        topic: sessionStorage.getItem("UID") + "notify",
+      });
+      await axios.post(`${NOTIFIER_URL}/start-producer`, {
+        topic: sessionStorage.getItem("UID") + "notified",
+      });
     }
     if (sectionNumber === 5) {
       // Stop listener logic for section 5
@@ -125,6 +136,15 @@ export default function SectionLayout(props: {
       stopListener("authorize", AUTHORIZER_URL);
       stopListener("notify", NOTIFIER_URL);
       stopListener("dlq", DLQ_URL);
+      await axios.post(`${PROVISIONER_URL}/stop-producer`, {
+        topic: sessionStorage.getItem("UID") + "authorize",
+      });
+      await axios.post(`${AUTHORIZER_URL}/start-producer`, {
+        topic: sessionStorage.getItem("UID") + "notify",
+      });
+      await axios.post(`${NOTIFIER_URL}/start-producer`, {
+        topic: sessionStorage.getItem("UID") + "notified",
+      });
     }
   };
 
@@ -152,16 +172,18 @@ export default function SectionLayout(props: {
             <Grid item sm={6}>
               {sectionNumber !== 1 && (
                 <Button
-                  component={Link}
                   color={"primary"}
-                  to={
-                    sectionNumber === 2 ? "/" : `/section-${sectionNumber - 1}`
-                  }
                   startIcon={<ChevronLeft />}
                   size={"large"}
                   sx={{ float: "left" }}
                   onClick={() => {
-                    stopListenerLogic();
+                    stopListenerLogic().then(() => {
+                      navigate(
+                        sectionNumber === 2
+                          ? "/"
+                          : `/section-${sectionNumber - 1}`
+                      );
+                    });
                   }}
                 >
                   Section {sectionNumber - 1}
@@ -171,14 +193,14 @@ export default function SectionLayout(props: {
             <Grid item sm={6}>
               {sectionNumber !== 5 && (
                 <Button
-                  component={Link}
                   color={"primary"}
-                  to={`/section-${sectionNumber + 1}`}
                   endIcon={<ChevronRight />}
                   size={"large"}
                   sx={{ float: "right" }}
                   onClick={() => {
-                    stopListenerLogic();
+                    stopListenerLogic().then(() => {
+                      navigate(`/section-${sectionNumber + 1}`);
+                    });
                   }}
                 >
                   Section {sectionNumber + 1}

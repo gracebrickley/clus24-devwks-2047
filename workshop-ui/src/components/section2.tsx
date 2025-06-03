@@ -18,6 +18,7 @@ export default function Section2() {
   const [consumerList, setConsumerList] = useState<any[]>([]);
   const [currentEventId, setCurrentEventId] = useState<number>(1);
   const [isListenerActive, setListenerActive] = useState(false);
+  const [disableButton, setDisableButton] = useState<boolean>(false);
 
   useEffect(() => {
     const producerInt = setInterval(() => {
@@ -69,13 +70,15 @@ export default function Section2() {
   }, [isProducerActive, isListenerActive]);
 
   async function sendEvent() {
-    setCurrentEventId(currentEventId + 1);
+    setDisableButton(true);
     await ProducerService.postEvent({
       prefix: sessionStorage.getItem("UID"),
       topic: "first-topic",
-      id: currentEventId - 1,
+      id: currentEventId,
       clicked: ProducerService.getPrettyTime(),
     });
+    setCurrentEventId(currentEventId + 1);
+    setDisableButton(false);
   }
 
   async function startListener() {
@@ -113,7 +116,7 @@ export default function Section2() {
         <Button
           variant={"contained"}
           color={"secondary"}
-          disabled={!isProducerActive}
+          disabled={!isProducerActive || disableButton}
           onClick={sendEvent}
         >
           Send Event

@@ -46,6 +46,7 @@ export default function Section4() {
   const [isNotifierActive, setNotifierActive] = useState(true);
   const [nextUserIndex, setNextUserIndex] = useState<number>(0);
   const [sagaTraces, setSagaTraces] = useState<{ [key: string]: any }[]>([]);
+  const [disableButton, setDisableButton] = useState<boolean>(false);
 
   useEffect(() => {
     const uid = sessionStorage.getItem("UID");
@@ -225,14 +226,16 @@ export default function Section4() {
   }, [sagaTraces]);
 
   async function sendEvent() {
-    setSagaTraces([userEntries[nextUserIndex][1], ...sagaTraces]);
-    setNextUserIndex(nextUserIndex + 1);
+    setDisableButton(true);
     await ProducerService.postEvent({
       prefix: sessionStorage.getItem("UID"),
       topic: "new-user",
-      id: nextUserIndex - 1,
-      ...userEntries[nextUserIndex - 1][1],
+      id: nextUserIndex,
+      ...userEntries[nextUserIndex][1],
     });
+    setSagaTraces([userEntries[nextUserIndex][1], ...sagaTraces]);
+    setNextUserIndex(nextUserIndex + 1);
+    setDisableButton(false);
   }
 
   async function clearTraces() {
@@ -274,7 +277,9 @@ export default function Section4() {
               variant={"contained"}
               color={"secondary"}
               disabled={
-                !isProducerActive || nextUserIndex >= userEntries.length
+                !isProducerActive ||
+                nextUserIndex >= userEntries.length ||
+                disableButton
               }
               onClick={sendEvent}
             >

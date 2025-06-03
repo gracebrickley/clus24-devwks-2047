@@ -45,6 +45,7 @@ export default function Section5() {
   const [nextUserIndex, setNextUserIndex] = useState<number>(0);
   const [sagaTraces, setSagaTraces] = useState<{ [key: string]: any }[]>([]);
   const [selectedTab, setSelectedTab] = React.useState("1");
+  const [disableButton, setDisableButton] = useState<boolean>(false);
 
   useEffect(() => {
     const uid = sessionStorage.getItem("UID");
@@ -300,15 +301,17 @@ export default function Section5() {
   }, [sagaTraces]);
 
   async function sendEvent() {
-    setSagaTraces([userEntries[nextUserIndex][1], ...sagaTraces]);
-    setNextUserIndex(nextUserIndex + 1);
+    setDisableButton(true);
     await ProducerService.postEvent({
       prefix: sessionStorage.getItem("UID"),
       topic: "new-user",
       errors: true,
-      id: nextUserIndex - 1,
-      ...userEntries[nextUserIndex - 1][1],
+      id: nextUserIndex,
+      ...userEntries[nextUserIndex][1],
     });
+    setSagaTraces([userEntries[nextUserIndex][1], ...sagaTraces]);
+    setNextUserIndex(nextUserIndex + 1);
+    setDisableButton(false);
   }
 
   function clearTraces() {
@@ -350,7 +353,11 @@ export default function Section5() {
         <Button
           variant={"contained"}
           color={"secondary"}
-          disabled={!isProducerActive || nextUserIndex >= userEntries.length}
+          disabled={
+            !isProducerActive ||
+            nextUserIndex >= userEntries.length ||
+            disableButton
+          }
           onClick={sendEvent}
         >
           Onboard New User

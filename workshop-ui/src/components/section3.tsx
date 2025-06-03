@@ -226,7 +226,7 @@ export default function Section3() {
           <Paper
             variant={"outlined"}
             square={false}
-            style={{ padding: "1rem", marginTop: "2rem" }}
+            style={{ padding: "1rem", flexGrow: 1 }}
             className={"consumer"}
           >
             <Typography variant="h4" gutterBottom>
@@ -297,7 +297,7 @@ export default function Section3() {
           <Paper
             variant={"outlined"}
             square={false}
-            style={{ padding: "1rem", marginTop: "2rem" }}
+            style={{ padding: "1rem", marginTop: "2.5rem", flexGrow: 1 }}
             className={"consumer"}
           >
             <Typography variant="h4" gutterBottom>
@@ -318,47 +318,50 @@ export default function Section3() {
             >
               Group: {secondConsumerGroup}
             </Typography>
-            <Button
-              variant={"contained"}
-              color={"primary"}
-              disabled={isListenerTwoActive || isListenerOrangeActive}
-              onClick={startListenerTwo}
-              style={{ marginRight: "1rem", marginBottom: "0.5rem" }}
-            >
-              Start Blue
-            </Button>
-            <Button
-              variant={"contained"}
-              color={"error"}
-              disabled={!isListenerTwoActive}
-              onClick={stopListenerTwo}
-              style={{ marginBottom: "0.5rem" }}
-            >
-              Stop Blue
-            </Button>
-            <Button
-              variant={"contained"}
-              color={"primary"}
-              style={{
-                backgroundColor: "#FFA500",
-                marginRight: "1rem",
-                marginBottom: "0.5rem",
-              }}
-              disabled={isListenerOrangeActive || isListenerTwoActive}
-              onClick={startListenerOrange}
-            >
-              Start Orange
-            </Button>
-            <Button
-              variant={"contained"}
-              color={"error"}
-              disabled={!isListenerOrangeActive}
-              onClick={stopListenerOrange}
-              style={{ marginBottom: "0.5rem" }}
-            >
-              Stop Orange
-            </Button>
-
+            <div>
+              <Button
+                variant={"contained"}
+                color={"primary"}
+                disabled={isListenerTwoActive || isListenerOrangeActive}
+                onClick={startListenerTwo}
+                style={{ marginRight: "1rem", marginBottom: "0.5rem" }}
+              >
+                Start Blue
+              </Button>
+              <Button
+                variant={"contained"}
+                color={"error"}
+                disabled={!isListenerTwoActive}
+                onClick={stopListenerTwo}
+                style={{ marginBottom: "0.5rem" }}
+              >
+                Stop Blue
+              </Button>
+            </div>
+            <div>
+              <Button
+                variant={"contained"}
+                color={"primary"}
+                style={{
+                  backgroundColor: "#FFA500",
+                  marginRight: "1rem",
+                  marginBottom: "0.5rem",
+                }}
+                disabled={isListenerOrangeActive || isListenerTwoActive}
+                onClick={startListenerOrange}
+              >
+                Start Orange
+              </Button>
+              <Button
+                variant={"contained"}
+                color={"error"}
+                disabled={!isListenerOrangeActive}
+                onClick={stopListenerOrange}
+                style={{ marginBottom: "0.5rem" }}
+              >
+                Stop Orange
+              </Button>
+            </div>
             <List>
               {secondConsumerList.length !== 0 &&
                 secondConsumerList.map((event: string, ind: number) => (

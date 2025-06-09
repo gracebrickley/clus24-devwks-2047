@@ -52,7 +52,7 @@ export default function Section4() {
     const uid = sessionStorage.getItem("UID");
     axios
       .post(`${PROVISIONER_URL}/start-consumer`, {
-        topic: uid + "new-user",
+        topic: uid + "-new-user",
         error: false,
       })
       .then((res) => {
@@ -67,7 +67,7 @@ export default function Section4() {
       });
     axios
       .post(`${PROVISIONER_URL}/start-consumer`, {
-        topic: uid + "notified",
+        topic: uid + "-notified",
         error: false,
       })
       .then((res) => {
@@ -82,7 +82,7 @@ export default function Section4() {
       });
     axios
       .post(`${PROVISIONER_URL}/start-producer`, {
-        topic: uid + "authorize",
+        topic: uid + "-authorize",
         error: false,
       })
       .then((res) => {
@@ -98,7 +98,7 @@ export default function Section4() {
 
     axios
       .post(`${AUTHORIZER_URL}/start-consumer`, {
-        topic: uid + "authorize",
+        topic: uid + "-authorize",
         error: false,
       })
       .then((res) => {
@@ -113,7 +113,7 @@ export default function Section4() {
       });
     axios
       .post(`${AUTHORIZER_URL}/start-producer`, {
-        topic: uid + "notify",
+        topic: uid + "-notify",
         error: false,
       })
       .then((res) => {
@@ -127,7 +127,7 @@ export default function Section4() {
 
     axios
       .post(`${NOTIFIER_URL}/start-consumer`, {
-        topic: uid + "notify",
+        topic: uid + "-notify",
         error: false,
       })
       .then((res) => {
@@ -140,7 +140,7 @@ export default function Section4() {
       });
     axios
       .post(`${NOTIFIER_URL}/start-producer`, {
-        topic: uid + "notified",
+        topic: uid + "-notified",
         error: false,
       })
       .then((res) => {

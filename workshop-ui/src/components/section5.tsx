@@ -51,7 +51,7 @@ export default function Section5() {
     const uid = sessionStorage.getItem("UID");
     axios
       .post(`${PROVISIONER_URL}/start-consumer`, {
-        topic: uid + "new-user",
+        topic: uid + "-new-user",
         error: true,
       })
       .then((res) => {
@@ -66,7 +66,7 @@ export default function Section5() {
       });
     axios
       .post(`${PROVISIONER_URL}/start-consumer`, {
-        topic: uid + "notified",
+        topic: uid + "-notified",
         error: true,
       })
       .then((res) => {
@@ -81,7 +81,7 @@ export default function Section5() {
       });
     axios
       .post(`${PROVISIONER_URL}/start-producer`, {
-        topic: uid + "authorize",
+        topic: uid + "-authorize",
         error: true,
       })
       .then((res) => {
@@ -96,7 +96,7 @@ export default function Section5() {
       });
     axios
       .post(`${PROVISIONER_URL}/start-producer`, {
-        topic: uid + "dlq",
+        topic: uid + "-dlq",
         error: true,
       })
       .then((res) => {
@@ -110,7 +110,7 @@ export default function Section5() {
 
     axios
       .post(`${AUTHORIZER_URL}/start-consumer`, {
-        topic: uid + "authorize",
+        topic: uid + "-authorize",
         error: true,
       })
       .then((res) => {
@@ -125,7 +125,7 @@ export default function Section5() {
       });
     axios
       .post(`${AUTHORIZER_URL}/start-producer`, {
-        topic: uid + "notify",
+        topic: uid + "-notify",
         error: true,
       })
       .then((res) => {
@@ -138,7 +138,7 @@ export default function Section5() {
       });
     axios
       .post(`${AUTHORIZER_URL}/start-producer`, {
-        topic: uid + "dlq",
+        topic: uid + "-dlq",
         error: true,
       })
       .then((res) => {
@@ -152,7 +152,7 @@ export default function Section5() {
 
     axios
       .post(`${NOTIFIER_URL}/start-consumer`, {
-        topic: uid + "notify",
+        topic: uid + "-notify",
         error: true,
       })
       .then((res) => {
@@ -165,7 +165,7 @@ export default function Section5() {
       });
     axios
       .post(`${NOTIFIER_URL}/start-producer`, {
-        topic: uid + "notified",
+        topic: uid + "-notified",
         error: true,
       })
       .then((res) => {
@@ -178,7 +178,7 @@ export default function Section5() {
       });
     axios
       .post(`${NOTIFIER_URL}/start-producer`, {
-        topic: uid + "dlq",
+        topic: uid + "-dlq",
         error: true,
       })
       .then((res) => {
@@ -191,7 +191,7 @@ export default function Section5() {
       });
 
     axios
-      .post(`${DLQ_URL}/start-listener`, { topic: uid + "dlq" })
+      .post(`${DLQ_URL}/start-listener`, { topic: uid + "-dlq" })
       .then((res) => {
         if (res.status === 200) {
           console.log("section 5 dlq consuming from topic dlq");

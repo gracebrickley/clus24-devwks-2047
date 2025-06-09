@@ -31,9 +31,9 @@ def receive_event():  # put application's code here
     logger.info("here is the request data: %s", request_data)
     request_data["produced"] = get_pretty_time_with_milliseconds()
     prefix = request_data["prefix"]
-    topic = prefix + "first-topic"
+    topic = prefix + "-first-topic"
     if "topic" in request_data:
-        topic = prefix + request_data["topic"]
+        topic = prefix + "-" + request_data["topic"]
     logger.info(f"Sending request data to topic: {topic} | request_data: {request_data}")
     producer.send(topic, request_data)
     producer.flush(timeout=5)

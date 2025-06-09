@@ -82,13 +82,13 @@ export default function Section2() {
   }
 
   async function startListener() {
-    const topic = sessionStorage.getItem("UID") + "first-topic";
+    const topic = sessionStorage.getItem("UID") + "-first-topic";
     await ProducerService.startListener(topic, FIRST_CONSUMER_URL);
     setListenerActive(true);
   }
 
   async function stopListener() {
-    const topic = sessionStorage.getItem("UID") + "first-topic";
+    const topic = sessionStorage.getItem("UID") + "-first-topic";
     await ProducerService.stopListener(topic, FIRST_CONSUMER_URL);
     setListenerActive(false);
   }
@@ -134,7 +134,7 @@ export default function Section2() {
 
         <Typography paragraph>
           Use the buttons below to start or stop a listener for the topic:{" "}
-          <strong>{sessionStorage.getItem("UID") + "first-topic"}</strong>.
+          <strong>{sessionStorage.getItem("UID") + "-first-topic"}</strong>.
         </Typography>
 
         <Button

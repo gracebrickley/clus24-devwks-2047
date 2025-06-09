@@ -50,12 +50,12 @@ func main() {
 		fmt.Println("Topic:", topic)
 		// Log the consumed messages
 		messageMapMu.Lock()
-		currMessages := MessageMap[prefix+topic]
+		currMessages := MessageMap[prefix+"-"+topic]
 		if currMessages == nil {
 			currMessages = make([]string, 0)
 		}
 		fmt.Println("Current messages:", currMessages)
-		MessageMap[prefix+topic] = make([]string, 0)
+		MessageMap[prefix+"-"+topic] = make([]string, 0)
 		messageMapMu.Unlock()
 		// Send the current messages as JSON response
 		w.Header().Set("Content-Type", "application/json")

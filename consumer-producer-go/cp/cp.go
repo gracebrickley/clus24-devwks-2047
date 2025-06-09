@@ -68,16 +68,16 @@ func main() {
 		}
 
 		messageMapMu.Lock()
-		currMessages := MessageMap[prefix+topic]
+		currMessages := MessageMap[prefix+"-"+topic]
 		if currMessages == nil {
 			currMessages = make([]string, 0)
 		}
 		if topic == "new-user" {
-			otherCurrMessages := MessageMap[prefix+"notified"]
+			otherCurrMessages := MessageMap[prefix+"-"+"notified"]
 			currMessages = append(currMessages, otherCurrMessages...)
-			MessageMap[prefix+"notified"] = make([]string, 0)
+			MessageMap[prefix+"-"+"notified"] = make([]string, 0)
 		}
-		MessageMap[prefix+topic] = make([]string, 0)
+		MessageMap[prefix+"-"+topic] = make([]string, 0)
 		messageMapMu.Unlock()
 
 		w.Header().Set("Content-Type", "application/json")
@@ -247,7 +247,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Message received from topic %s: %s", req.Topic, string(m.Value))
 
 			if strings.Contains(req.Topic, "new-user") {
-				prefix := strings.Split(req.Topic, "new")[0]
+				prefix := strings.Split(req.Topic, "-new")[0]
 				var messageData map[string]interface{}
 				if err := json.Unmarshal(m.Value, &messageData); err != nil {
 					log.Printf("Failed to unmarshal message value: %v", err)
@@ -255,7 +255,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				department := messageData["dept"]
 				if isError && department == "Finance" {
-					errorProducer := producers[prefix+"dlq"]
+					errorProducer := producers[prefix+"-dlq"]
 					var messageData map[string]interface{}
 					if err := json.Unmarshal(m.Value, &messageData); err != nil {
 						log.Printf("Failed to unmarshal message value: %v", err)
@@ -264,7 +264,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 					userId := capitalizeFirstLetter(messageData["id"].(string))
 					err := errorProducer.WriteMessages(context.Background(),
 						kafka.Message{
-							Key:   []byte(prefix + "dlq"),
+							Key:   []byte(prefix + "-dlq"),
 							Value: []byte(fmt.Sprintf("Provisioner: user %s is invalid; could this be a security breach?", userId)),
 						},
 					)
@@ -272,7 +272,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 						log.Printf("Failed to write error message to DLQ: %v", err)
 					}
 				} else {
-					producerTopic := prefix + "authorize"
+					producerTopic := prefix + "-authorize"
 					producerMessage := m.Value
 					producerMessage = []byte(strings.Replace(string(producerMessage), "new-user", "authorize", 1))
 					producersMu.Lock()
@@ -297,9 +297,9 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			if strings.Contains(req.Topic, "authorize") {
-				prefix := strings.Split(req.Topic, "authorize")[0]
+				prefix := strings.Split(req.Topic, "-authorize")[0]
 				if isError && shouldRaiseError() {
-					errorProducer := producers[prefix+"dlq"]
+					errorProducer := producers[prefix+"-dlq"]
 					var messageData map[string]interface{}
 					if err := json.Unmarshal(m.Value, &messageData); err != nil {
 						log.Printf("Failed to unmarshal message value: %v", err)
@@ -313,7 +313,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 					}
 					err := errorProducer.WriteMessages(context.Background(),
 						kafka.Message{
-							Key:   []byte(prefix + "dlq"),
+							Key:   []byte(prefix + "-dlq"),
 							Value: []byte(fmt.Sprintf("Authorizer: device type %s for user %s requires security updates, cannot authorize", deviceId, userId)),
 						},
 					)
@@ -321,7 +321,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 						log.Printf("Failed to write error message to DLQ: %v", err)
 					}
 				} else {
-					producerTopic := prefix + "notify"
+					producerTopic := prefix + "-notify"
 					producerMessage := m.Value
 					producerMessage = []byte(strings.Replace(string(producerMessage), "authorize", "notify", 1))
 					producersMu.Lock()
@@ -346,9 +346,9 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			if strings.Contains(req.Topic, "notify") {
-				prefix := strings.Split(req.Topic, "notify")[0]
+				prefix := strings.Split(req.Topic, "-notify")[0]
 				if isError && shouldRaiseError() {
-					errorProducer := producers[prefix+"dlq"]
+					errorProducer := producers[prefix+"-dlq"]
 					var messageData map[string]interface{}
 					if err := json.Unmarshal(m.Value, &messageData); err != nil {
 						log.Printf("Failed to unmarshal message value: %v", err)
@@ -357,7 +357,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 					userId := capitalizeFirstLetter(messageData["id"].(string))
 					err := errorProducer.WriteMessages(context.Background(),
 						kafka.Message{
-							Key:   []byte(prefix + "dlq"),
+							Key:   []byte(prefix + "-dlq"),
 							Value: []byte(fmt.Sprintf("Notifier: could not find LDAP account for user %s", userId)),
 						},
 					)
@@ -365,7 +365,7 @@ func StartConsumerHandler(w http.ResponseWriter, r *http.Request) {
 						log.Printf("Failed to write error message to DLQ: %v", err)
 					}
 				} else {
-					producerTopic := prefix + "notified"
+					producerTopic := prefix + "-notified"
 					producerMessage := m.Value
 					producerMessage = []byte(strings.Replace(string(producerMessage), "notify", "notified", 1))
 					producersMu.Lock()

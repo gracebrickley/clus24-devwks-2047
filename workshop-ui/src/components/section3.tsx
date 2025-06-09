@@ -144,37 +144,37 @@ export default function Section3() {
   }
 
   async function startListenerOne() {
-    const topic = sessionStorage.getItem("UID") + "second-topic";
+    const topic = sessionStorage.getItem("UID") + "-second-topic";
     await ProducerService.startListener(topic, BLUE_CONSUMER_URL);
     setListenerOneActive(true);
   }
 
   async function stopListenerOne() {
-    const topic = sessionStorage.getItem("UID") + "second-topic";
+    const topic = sessionStorage.getItem("UID") + "-second-topic";
     await ProducerService.stopListener(topic, BLUE_CONSUMER_URL);
     setListenerOneActive(false);
   }
 
   async function startListenerTwo() {
-    const topic = sessionStorage.getItem("UID") + "second-topic";
+    const topic = sessionStorage.getItem("UID") + "-second-topic";
     await ProducerService.startListener(topic, FIRST_CONSUMER_URL);
     setListenerTwoActive(true);
   }
 
   async function stopListenerTwo() {
-    const topic = sessionStorage.getItem("UID") + "second-topic";
+    const topic = sessionStorage.getItem("UID") + "-second-topic";
     await ProducerService.stopListener(topic, FIRST_CONSUMER_URL);
     setListenerTwoActive(false);
   }
 
   async function startListenerOrange() {
-    const topic = sessionStorage.getItem("UID") + "second-topic";
+    const topic = sessionStorage.getItem("UID") + "-second-topic";
     await ProducerService.startListener(topic, ORANGE_CONSUMER_URL);
     setListenerOrangeActive(true);
   }
 
   async function stopListenerOrange() {
-    const topic = sessionStorage.getItem("UID") + "second-topic";
+    const topic = sessionStorage.getItem("UID") + "-second-topic";
     await ProducerService.stopListener(topic, ORANGE_CONSUMER_URL);
     setListenerOrangeActive(false);
   }
